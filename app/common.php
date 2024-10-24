@@ -74,3 +74,13 @@ if (!function_exists('array_format_key')) {
     }
 
 }
+/**
+ * 统一返回信息
+ * @param $code
+ * @param $data
+ * @param $msge
+ */
+function msg($code, $data, $msg)
+{
+    return json(compact('code', 'data', 'msg'));
+}

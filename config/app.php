@@ -31,7 +31,7 @@ return [
     // 禁止URL访问的应用列表（自动多应用模式有效）
     'deny_app_list'    => ['common'],
     // 异常页面的模板文件
-    'exception_tmpl'   => Env::get('app_debug') == 1 ? app()->getThinkPath() . 'tpl/think_exception.tpl' : app()->getBasePath() . 'common' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'think_exception.tpl',
+    // 'exception_tmpl'   => Env::get('app_debug') == 1 ? app()->getThinkPath() . 'tpl/think_exception.tpl' : app()->getBasePath() . 'common' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'think_exception.tpl',
     // http异常页面的模板文件
     'http_exception_template' => [
         404 => base_path('common' . DIRECTORY_SEPARATOR . 'tpl') . '404.html'
@@ -41,9 +41,20 @@ return [
     // 跳转页面的失败模板文件
     'dispatch_error_tmpl'   => app()->getBasePath() . 'common' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'dispatch_jump.tpl',
     // 错误显示信息,非调试模式有效
-    'error_message'    => '页面错误！请稍后再试～',
+    // 'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
-    'show_error_msg'   => false,
+    'show_error_msg'   => true,
     // 静态资源上传到OSS前缀
     'oss_static_prefix'   => Env::get('easyadmin.oss_static_prefix', 'static_easyadmin'),
+    // 自定义全局常量
+    'const_data'        => [
+        // api limit默认10条数据
+        'api_limit' => '10',
+        'appid' => 'wx49d709d931c6a99b',
+        'appsecret' => 'd084a523745c32c3c09b1db5515e1ce5',
+        'mch_id' => '1656083885', 
+        'secret_key' => 'DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3', //V2、V3秘钥
+        'notify_url' => 'http://www.jingxiaoshang.com/api/order/notify', //支付回调
+        'prcode_url' => 'http://www.jingxiaoshang.com/api/index/index', //二维码路径
+    ],
 ];

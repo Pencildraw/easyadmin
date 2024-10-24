@@ -1,0 +1,34 @@
+
+http://www.jingxiaoshang.com/admin/index
+admin
+admin
+
+crud
+php think curd -t mall_order -c dealer/order -m dealer/order
+php think curd -t company_salesman -c dealer/salesman -m dealer/salesman
+php think curd -t company_shop -c dealer/shop -m dealer/shop
+
+禾惠农业公众号
+Appid:wx49d709d931c6a99b
+秘钥:d084a523745c32c3c09b1db5515e1ce5
+Token:67YrYe4x4FmA2gLyxzuVqukoNYMeVnyc
+EncodingAESKey:KmudnqH1BSKKRp5HPH4nu4w0q0lAuG6t9LGjDhLCkhT
+
+富友电商 微信支付
+商务号：1656083885
+V2、V3秘钥： DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3
+
+
+$this->model->startTrans();
+try {
+
+    if (!$this->model->insertAll(array_slice($orderData, $i, $batchSize))) {
+        $this->model->rollback();
+        throw new \Exception('保存失败:'.'导入订单保存失败');
+    }
+} catch (\Exception $e) {
+    $this->model->rollback();
+    $this->error('保存失败:'.$e->getMessage());
+}
+$this->model->commit();
+$this->success('保存成功');
