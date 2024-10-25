@@ -18,7 +18,13 @@ EncodingAESKey:KmudnqH1BSKKRp5HPH4nu4w0q0lAuG6t9LGjDhLCkhT
 商务号：1656083885
 V2、V3秘钥： DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3
 
+qrcide
+composer require endroid/qr-code
 
+jwt
+composer require firebase/php-jwt
+
+//事务
 $this->model->startTrans();
 try {
 
@@ -32,3 +38,9 @@ try {
 }
 $this->model->commit();
 $this->success('保存成功');
+
+return msg(100,'获取失败',$result['errmsg']); 
+return msg(200,'获取成功',$result);
+
+i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.password,i.user_id,i.shop_address
+    

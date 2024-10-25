@@ -27,10 +27,13 @@ class Goods extends BaseController
         $post = $this->request->post();
         $goods_id = $post['goods_id'] ??0;
         if (!$goods_id) {
-            return msg(100,'','商品参数错误');
+            return msg(100,'商品参数错误','');
         }
         $goodsModel = new GoodsModel;
-        // $goodsData = goodsModel->where('status')->find($goods_id);
-
+        $goodsData = $goodsModel->where('status' ,1)->find($goods_id);
+        if (empty($goodsData)) {
+            return msg(100,'商品错误','');
+        }
+        return msg(200,'获取成功',$goodsData);
     }    
 }

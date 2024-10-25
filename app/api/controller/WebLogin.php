@@ -48,7 +48,29 @@ class WebLogin extends BaseController
 
     }
 
-    public function login()  
+    public function login()
+    {
+        $post = $this->request->post();
+        $name = $post['name'] ??'';
+        $password = $post['password'] ??'';
+        if (!$name || !$password) {
+            return msg(100,'参数错误',$post); 
+        }
+        $whereIs[] = [
+            'name' => $name,
+            'password' => md5(md5($password)),
+            'status' => 1
+        ];
+        $identityModel = new \app\api\model\Identity;
+        $row = $identityModel->where($whereIs)->find();
+        if (empty($row)) {
+            return msg(100,'登录失败',''); 
+        } else {
+            return msg(200,'登录成功',$row); 
+        }
+    }
+
+    public function exchange()  
     {  
         // $code = Request::param('code');  
         $code = $this->request->param('code');  
@@ -63,15 +85,14 @@ class WebLogin extends BaseController
  
         if (isset($result['errcode'])) {  
             // 处理错误  
-            return json(['code' => -1, 'msg' => '登录失败' ,'error' => $result['errmsg']]);  
-            // return json(['error' => $result['errmsg']], 400);  
+            return msg(100,'获取失败',$result['errmsg']); 
         }  
  
         // $openid = $result['openid'];  
         // $sessionKey = $result['session_key'];  
  
         // 在这里你可以将 openid 和 session_key 存储在你的数据库中，或者进行其他处理  
-        return json(['code' => 1, 'msg' => '登录成功', 'data' => $result]);  
+        return msg(200,'获取成功',$result);
         // return json(['openid' => $openid, 'session_key' => $sessionKey]);  
     } 
 
@@ -96,8 +117,8 @@ class WebLogin extends BaseController
 
         if (isset($userInfo['errcode'])) {  
             // 处理错误  
-            // return json(['error' => $userInfo['errmsg']], 400);  
-            return json(['code' => -1, 'msg' => '获取失败' ,'error' => $userInfo['errmsg']]);  
+            return msg(100,'获取失败',$userInfo['errmsg']);
+            // return json(['code' => -1, 'msg' => '获取失败' ,'error' => $userInfo['errmsg']]);  
         }  
 
         return json($userInfo);  

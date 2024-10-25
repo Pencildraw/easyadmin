@@ -77,10 +77,10 @@ if (!function_exists('array_format_key')) {
 /**
  * 统一返回信息
  * @param $code
+ * @param $msg
  * @param $data
- * @param $msge
  */
-function msg($code, $data, $msg)
+function msg($code, $msg, $data)
 {
-    return json(compact('code', 'data', 'msg'));
+    return json(compact('code', 'msg', 'data'));
 }
