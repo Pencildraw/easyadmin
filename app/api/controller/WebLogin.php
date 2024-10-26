@@ -32,11 +32,6 @@ class WebLogin extends ApiController
     // 初始化
     public function initialize()
     {
-        // return json([
-        //     'code'  => -1,
-        //     'msg'   => '小程序未登录,请登录!',
-        // ]);
-        // exit();
         $this->limit_page = Config::get('app')['const_data']['api_limit'];  //limit_page 
         $this->appid = Config::get('app')['const_data']['appid'];  //config-appid全局常量
         $this->appsecret = Config::get('app')['const_data']['appsecret'];  //config-appsecret 全局常量
@@ -118,12 +113,12 @@ class WebLogin extends ApiController
 
     public function exchange()  
     {  
-        // $code = Request::param('code');  
-        $code = $this->request->param('code');  
-        // print_r($code); exit;
-        // $this->appid = $this->appid;  
-        // $this->appsecret = $this->appsecret;  
- 
+        $post = $this->request->post();
+        $rule = [
+            'code|必要条件'       => 'require',
+        ];
+        $this->validate($post, $rule);
+        $code = $this->request->post('code');  
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$this->appid}&secret={$this->appsecret}&code={$code}&grant_type=authorization_code";  
  
         $response = file_get_contents($url);  
@@ -134,12 +129,7 @@ class WebLogin extends ApiController
             return msg(100,'获取失败',$result['errmsg']); 
         }  
  
-        // $openid = $result['openid'];  
-        // $sessionKey = $result['session_key'];  
- 
-        // 在这里你可以将 openid 和 session_key 存储在你的数据库中，或者进行其他处理  
         return msg(200,'获取成功',$result);
-        // return json(['openid' => $openid, 'session_key' => $sessionKey]);  
     } 
 
     public function getUserInfo($openid, $sessionKey)  

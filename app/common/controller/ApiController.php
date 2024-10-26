@@ -12,9 +12,9 @@ use think\facade\Db;
  */
 class ApiController extends BaseController
 {
-    protected $supplier_id = 1; //供应商ID
-    protected $dealer_id = 6; //经销商ID
-    protected $user_id = 1; //用户ID
+    // protected $supplier_id = 1; //供应商ID
+    // protected $dealer_id = 6; //经销商ID
+    // protected $user_id = 1; //用户ID
     protected $identity = []; //身份信息
     // 初始化
     protected function initialize()
@@ -37,34 +37,34 @@ class ApiController extends BaseController
         // 全局身份信息
         $this->identity = objToArray($identity);
     }
-    public function checkUser()
-    {
-        //强制post
-        if (!$this->request->isPost()){
-            if(!$this->checkLogin(1)){
-                echo '别瞎搞';
-                exit;
-            }
-        }
-        //验证登录
-        try {
-            $token = $this->request->header('x-access-token');
-            if(!isset($token) || $token == ''){
-                return false;
-            }
-            $user = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
+    // public function checkUser()
+    // {
+    //     //强制post
+    //     if (!$this->request->isPost()){
+    //         if(!$this->checkLogin(1)){
+    //             echo '别瞎搞';
+    //             exit;
+    //         }
+    //     }
+    //     //验证登录
+    //     try {
+    //         $token = $this->request->header('x-access-token');
+    //         if(!isset($token) || $token == ''){
+    //             return false;
+    //         }
+    //         $user = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
 
-            $userInfo = (new \app\api\model\User())->userWhereInfo(objToArray($user));
-            if(!$userInfo){
-                return false;
-            }
-            $this->user = $userInfo;
-        } catch (\Exception $e) {
-            return false;
-        }
+    //         $userInfo = (new \app\api\model\User())->userWhereInfo(objToArray($user));
+    //         if(!$userInfo){
+    //             return false;
+    //         }
+    //         $this->user = $userInfo;
+    //     } catch (\Exception $e) {
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
     /**
      * api验证数据
      * @access protected

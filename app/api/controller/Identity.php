@@ -31,7 +31,7 @@ class Identity extends ApiController
     public function info(){
         $identityData = $this->identityModel->alias('i')
             ->leftJoin('company_user u' ,'i.user_id = u.id')
-            ->where('i.user_id',$this->user_id)
+            ->where('i.user_id',$this->identity['user_id'])
             ->where('i.status',1)
             ->where('u.status',1)
             ->field('i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_address')
@@ -66,7 +66,7 @@ class Identity extends ApiController
         //事务
         $this->identityModel->startTrans();
         try {
-            $this->identityModel->where('user_id',$this->user_id)->save($data);
+            $this->identityModel->where('user_id',$this->identity['user_id'])->save($data);
         } catch (\Exception $e) {
             $this->identityModel->rollback();
             return msg(100,'保存失败',$post); 

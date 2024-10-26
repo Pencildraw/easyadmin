@@ -88,8 +88,9 @@ class Order extends ApiController
             'total_amount' => $post['total_amount'],
             'order_amount' => $post['total_amount'],
             'ok_amount' => $post['ok_amount'],
-            'supplier_id' => $this->supplier_id, //供应商ID
-            'dealer_id' => $this->dealer_id, //经销商ID
+            // 'supplier_id' => $this->supplier_id, //供应商ID
+            // 'dealer_id' => $this->dealer_id, //经销商ID
+            'identity_id' => $this->identity['id'], //经销商ID
             'remark' => $post['remark'] ??'',
         ];
         // 订单商品
