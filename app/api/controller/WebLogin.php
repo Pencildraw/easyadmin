@@ -2,22 +2,18 @@
 // 用户
 namespace app\api\controller;
  
-// use app\common\controller\AdminController;
+use app\common\controller\ApiController;
 use think\App;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
 use app\BaseController;
-use app\common\constants\AdminConstant;
-use app\common\service\AuthService;
-use EasyAdmin\tool\CommonTool;
-use think\facade\View;
-use think\Model;
-use think\Request;
 use think\facade\Config;
 use think\facade\Cache;  
 use think\facade\Http;  
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
-class WebLogin extends BaseController
+class WebLogin extends ApiController
 {
     protected $appid;  
     protected $appsecret;  
@@ -51,23 +47,73 @@ class WebLogin extends BaseController
     public function login()
     {
         $post = $this->request->post();
+        
+        $rule = [
+            'name|必要条件'       => 'require',
+            'password|必要条件'       => 'require',
+            'openid|必要条件'       => 'require',
+        ];
+        $this->validate($post, $rule);
         $name = $post['name'] ??'';
         $password = $post['password'] ??'';
         if (!$name || !$password) {
             return msg(100,'参数错误',$post); 
         }
-        $whereIs[] = [
+        $whereIs = [
             'name' => $name,
             'password' => md5(md5($password)),
             'status' => 1
         ];
         $identityModel = new \app\api\model\Identity;
+        if ($identityModel->where('name',$name)->where('status',1)->count() <1) {
+            return msg(100,'不存在账号或已禁用: '.$name,''); 
+        }
         $row = $identityModel->where($whereIs)->find();
+        // print_r($row); exit;
+        // print_r(config('app.jwt.key')); exit;
+        $data['token'] = '';
         if (empty($row)) {
             return msg(100,'登录失败',''); 
         } else {
-            return msg(200,'登录成功',$row); 
+            $userModel = new \app\api\model\User;
+            $user = $userModel->where('id',$row['user_id'])->where('status',1)->find();
+            if (empty($user)) {
+                return msg(100,'不存在用户或已禁用: '.$row['phone'],''); 
+            }
+            $userModel->startTrans();
+            try {
+                $user->openid = $post['openid'];
+                $user->save();
+            } catch (\Exception $e) {
+                $userModel->rollback();
+                return msg(100,'保存失败:'.$e->getMessage(),'');
+            }
+            $userModel->commit();
+            $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+            return msg(200,'登录成功',$data); 
         }
+    }
+    public function getToken()
+    {
+        $post = $this->request->post();
+        $rule = [
+            'openid|必要条件'       => 'require',
+        ];
+        $this->validate($post, $rule);
+
+        $userModel = new \app\api\model\User;
+        $user = $userModel->where(['openid'=>$post['openid'],'status'=>1])->find();
+
+        $data['token'] = '';
+        if($user && $user['id']){
+            $identityModel = new \app\api\model\Identity;
+            if ($identityModel->where('user_id',$user['id'])->where('status',1)->count() <1) {
+                return msg(100,'不存在账号或已禁用: '.$user['name'],''); 
+            }
+            $row = $identityModel->where('user_id',$user['id'])->find();
+            $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+        }
+        return msg(200,'操作成功',$data);
     }
 
     public function exchange()  

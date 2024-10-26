@@ -2,7 +2,7 @@
 // 用户
 namespace app\api\controller;
  
-// use app\common\controller\AdminController;
+use app\common\controller\ApiController;
 use think\App;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
@@ -17,7 +17,7 @@ use think\facade\Config;
 use think\facade\Cache;  
 use think\facade\Http;  
 
-class Pay extends BaseController
+class Pay extends ApiController
 {
     protected $appid;  
     protected $appsecret;  

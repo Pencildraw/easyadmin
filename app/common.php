@@ -84,3 +84,11 @@ function msg($code, $msg, $data)
 {
     return json(compact('code', 'msg', 'data'));
 }
+/**
+ * 对象转换成数组
+ * @param $obj
+ */
+function objToArray($obj)
+{
+    return json_decode(json_encode($obj), true);
+}

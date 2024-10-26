@@ -26,12 +26,14 @@ class Order extends ApiController
     // 初始化
     protected function initialize()
     {
+        //继承验证、登录通用方法
+        parent::initialize();
         $this->orderModel = new orderModel;
     }
 
     // 列表
     public function list(){
-        $orderList = $this->orderModel::with('orderList')->where('user_id',$this->user_id)->select()->toArray();
+        $orderList = $this->orderModel::with('orderList')->where('user_id',$this->identity['user_id'])->select()->toArray();
         if (empty($orderList)) {
             return msg(100,'获取失败',''); 
         } else {
@@ -48,7 +50,7 @@ class Order extends ApiController
             'order_id|订单参数'       => 'require',
         ];
         $this->validate($post, $rule,[]);
-        $orderList = $this->orderModel::with('orderList')->where('id',$post['order_id'])->where('user_id',$this->user_id)->find()->toArray();
+        $orderList = $this->orderModel::with('orderList')->where('id',$post['order_id'])->where('user_id',$this->identity['user_id'])->find()->toArray();
         if (empty($orderList)) {
             return msg(100,'获取失败',''); 
         } else {
@@ -79,7 +81,7 @@ class Order extends ApiController
         // 主订单
         $orderData = [
             'order_status' => 0,
-            'user_id' => $this->user_id, //用户ID
+            'user_id' => $this->identity['user_id'], //用户ID
             'order_name' => $post['order_name'],
             'order_phone' => $post['order_name'],
             'order_address' => $post['order_name'],

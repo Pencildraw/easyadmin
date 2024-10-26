@@ -15,61 +15,27 @@ class ApiController extends BaseController
     protected $supplier_id = 1; //供应商ID
     protected $dealer_id = 6; //经销商ID
     protected $user_id = 1; //用户ID
+    protected $identity = []; //身份信息
     // 初始化
     protected function initialize()
     {
         parent::initialize();
-        //强制post
-//        if (!$this->request->isPost()){
-//            if(!$this->checkLogin(1)){
-//                echo '别瞎搞';
-//                exit;
-//            }
-//
-//        }
-
         //验证登录
-        // if(!$this->checkLogin(2)){
-
-        //     try {
-        //         $token = $this->request->header('x-access-token');
-        //         if(!isset($token) || $token == ''){
-        //             echo json_encode(['code'=>100,'data'=>'','msg'=>'请先登录']);
-        //             exit;
-        //         }
-        //         $user = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
-
-        //         $userInfo = (new \app\api\model\User())->userWhereInfo(objToArray($user));
-        //         if(!$userInfo){
-        //             echo json_encode(['code'=>100,'data'=>'','msg'=>'请先登录']);
-        //             exit;
-        //         }
-        //         $this->user = $userInfo;
-        //     } catch (\Exception $e) {
-        //         echo json_encode(['code'=>100,'data'=>'','msg'=>'请先登录']);
-        //         exit;
-        //     }
-        // }else{
-        //     $token = $this->request->header('x-access-token');
-        //     if(isset($token) && $token != ''){
-        //         $user = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
-
-        //         $userInfo = (new \app\api\model\User())->userWhereInfo(objToArray($user));
-        //         if($userInfo){
-        //             $this->user = $userInfo;
-        //         }
-        //     }
-        // }
-        // $sign = $this->request->header('x-sign');
-
-        // if(isset($sign) && $sign != '' && $sign != '{{sign}}'){
-        //     $company = (new \app\api\model\Company())->where('wx_appid_md5',$sign)->field('id,title,wx_appid,wx_secret,mch_id,api_v2_key,cert_path,key_path')->find();
-        //     if(!$company){
-        //         echo json_encode(['code'=>100,'data'=>'','msg'=>'无效的签名']);
-        //         exit;
-        //     }
-        //     $this->company = $company;
-        // }
+        $token = $this->request->header('x-access-token');
+        // var_dump($token); exit;
+        if(!isset($token) || $token == ''){
+            echo json_encode(['code'=>100,'msg'=>'请先登录','data'=>'']);
+            exit;
+        }
+        // 验证身份
+        $identity = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
+        $identityInfo = (new \app\api\model\Identity())->identityInfo(objToArray($identity));
+        if(!$identityInfo){
+            echo json_encode(['code'=>100,'msg'=>'请先登录','data'=>'']);
+            exit;
+        }
+        // 全局身份信息
+        $this->identity = objToArray($identity);
     }
     public function checkUser()
     {

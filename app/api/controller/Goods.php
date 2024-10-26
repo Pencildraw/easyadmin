@@ -2,7 +2,7 @@
 // 用户
 namespace app\api\controller;
  
-// use app\common\controller\AdminController;
+use app\common\controller\ApiController;
 use think\App;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
@@ -19,7 +19,7 @@ use think\facade\Http;
 
 use app\api\model\Goods as GoodsModel;
 
-class Goods extends BaseController
+class Goods extends ApiController
 {
     // 详情
     public function info(){

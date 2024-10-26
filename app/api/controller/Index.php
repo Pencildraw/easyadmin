@@ -2,7 +2,7 @@
 // 命名空间定义
 namespace app\api\controller;
  
-// use app\common\controller\AdminController;
+use app\common\controller\ApiController;
 use think\App;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
@@ -15,7 +15,7 @@ use think\Model;
 use think\Request;
 use think\facade\Config;
 
-class Index extends BaseController
+class Index extends ApiController
 {
     public function __construct(App $app)
     {
