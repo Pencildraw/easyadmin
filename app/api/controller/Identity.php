@@ -24,6 +24,8 @@ class Identity extends ApiController
     // 初始化
     protected function initialize()
     {
+        //继承验证、登录通用方法
+        parent::initialize();
         $this->identityModel = new identityModel;
     }
 

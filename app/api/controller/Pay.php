@@ -28,10 +28,10 @@ class Pay extends ApiController
     public function __construct(App $app)
     {
         parent::__construct($app);
-
+        //继承验证、登录通用方法
+        parent::initialize();
         // 控制器初始化
         $this->initialize();
-        // 初始化时自定义方法
     }
 
     // 初始化
@@ -47,24 +47,35 @@ class Pay extends ApiController
 
     public function unifiedOrder()
     {
-        // 获取请求参数
-        $params = $this->request->param();
+        $post = $this->request->post();
         
-        $openid = '111111';
+        $rule = [
+            'order_id|必要条件'       => 'require',
+        ];
+        $this->validate($post, $rule);
+        
+        $openid = \app\api\model\User::where('id',$this->identity['user_id'])->value('openid');
+        if (!$openid) {
+            return msg(100,'无效用户',$post);
+        }
+        $order = \app\api\model\Order::where('id',$post['order_id'])->find();
+        if (empty($order)) {
+            return msg(100,'无效订单',$post);
+        }
         // 设置统一下单请求参数
         $data = [
             'appid' => $this->appid,
             'mch_id' => $this->mch_id,
-            'nonce_str' => md5(time()),
+            'nonce_str' => $order->order_sn,
             'body' => '商品描述',
             'out_trade_no' => time(), // 订单号
-            'total_fee' => $params['total_fee'], // 总金额，单位为分
+            'total_fee' => $order->total_fee *100, // 总金额，单位为分
             'spbill_create_ip' => $_SERVER['REMOTE_ADDR'],
             'notify_url' => Config::get('app')['const_data']['notify_url'],
             'trade_type' => 'JSAPI',
             'openid' => $openid, // 用户标识
         ];
-        print_r($data); exit;
+        // print_r($data); exit;
         
         // 生成签名
         $data['sign'] = $this->generateSign($data);
@@ -80,7 +91,7 @@ class Pay extends ApiController
         
         if ($responseData->return_code == 'SUCCESS' && $responseData->result_code == 'SUCCESS') {
             // 返回前端需要的参数
-            return json([
+            $payData = json([
                 'appId' => $responseData->appid,
                 'timeStamp' => time(),
                 'nonceStr' => $responseData->nonce_str,
@@ -94,9 +105,10 @@ class Pay extends ApiController
                     'signType' => 'MD5',
                 ]),
             ]);
+            return msg(200,'下单成功',$payData);
         } else {
             // Log::error('统一下单失败: ' . $responseData->return_msg);
-            return json(['error' => '统一下单失败']);
+            return msg(100,'下单失败','');
         }
     }
     

@@ -12,7 +12,7 @@ use think\facade\Db;
  */
 class ApiController extends BaseController
 {
-    // protected $supplier_id = 1; //供应商ID
+    protected $supplier_id = 1; //供应商ID
     // protected $dealer_id = 6; //经销商ID
     // protected $user_id = 1; //用户ID
     protected $identity = []; //身份信息

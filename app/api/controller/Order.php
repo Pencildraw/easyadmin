@@ -38,12 +38,10 @@ class Order extends ApiController
             return msg(100,'获取失败',''); 
         } else {
             return msg(200,'获取成功',$orderList);
-        }
-        
-
+        } 
     }
 
-    // 列表
+    // 详情
     public function info(){
         $post = $this->request->post();
         $rule = [
@@ -88,10 +86,11 @@ class Order extends ApiController
             'total_amount' => $post['total_amount'],
             'order_amount' => $post['total_amount'],
             'ok_amount' => $post['ok_amount'],
-            // 'supplier_id' => $this->supplier_id, //供应商ID
+            'supplier_id' => $this->supplier_id, //供应商ID
             // 'dealer_id' => $this->dealer_id, //经销商ID
             'identity_id' => $this->identity['id'], //经销商ID
             'remark' => $post['remark'] ??'',
+            'order_sn' => generateNumber(),
         ];
         // 订单商品
         $goodsModel = new goodsModel();
@@ -137,5 +136,98 @@ class Order extends ApiController
         $this->orderModel->commit();
         return msg(200,'保存成功',['order_id'=>$insertGetId]);
 
-    }    
+    }   
+
+    // 修改订单
+    public function update(){
+        $post = $this->request->post();
+        $rule = [
+            'order_id|订单参数'       => 'require',
+        ];
+        $this->validate($post, $rule,[]);
+        // 校验
+        $row = $this->orderModel->find($post['order_id']);
+        if (empty($row)) {
+            return msg(100,'无效订单',$post);
+        }
+        // 修改订单
+        if (!empty($post['order_name'])) {
+            $row->order_name = $post['order_name'];
+        }
+        if (!empty($post['order_phone'])) {
+            $row->order_phone = $post['order_phone'];
+        }
+        if (!empty($post['order_address'])) {
+            $row->order_address = $post['order_address'];
+        }
+        if (!empty($post['remark'])) {
+            $row->remark = $post['remark'];
+        }
+        //事务
+        $this->orderModel->startTrans();
+        try {
+            $row->save();
+        } catch (\Exception $e) {
+            $this->orderModel->rollback();
+            return msg(100,'保存失败',$post);
+        }
+        return msg(200,'保存成功',['order_id'=>$row->id]);
+    }
+    
+    // 微信支付回调
+    public function orderNotify(){
+        $data = file_get_contents('php://input');
+        $file=fopen("file.txt","w");
+        if($file){
+            fwrite($file,$data);
+            fclose($file);
+        }
+        $message = (array)simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if ($message['result_code'] == 'SUCCESS' && $message['return_code'] == 'SUCCESS') {
+            $str = $message['out_trade_no'];
+            $pos = strpos($str, "|");
+
+            if ($pos !== false) {
+                // 使用 substr 去掉 | 及其之后的部分
+                $order_sn = substr($str, 0, $pos);
+            } else {
+                // 如果没有找到指定的字符串，原样输出
+                $order_sn = $str;
+            }
+            $openid = $message['openid'];                  // 付款人openID
+            $total_fee = ($message['total_fee']) / 100;            // 付款金额
+            $transaction_id = $message['transaction_id'];  // 微信支付流水号
+            $order = $this->orderModel->where(['order_sn' => $order_sn])->find();
+            if($order){
+                $status = 1; //订单状态 0:待付款 1:已付首款 2:全款已付
+            
+                //事务开始
+                $this->orderModel->startTrans();
+                try{
+                    $orderData = [
+                        'ok_amount'         =>  $total_fee + $order->ok_amount,
+                        'status'            =>  1,
+                    ];
+                    $this->orderModel->where('id', $order->id)->update($orderData);
+                    $userModel = new \app\api\model\User();
+                    $payLogData = [
+                        'order_id'         =>  $order->id,
+                        'user_id'         =>  $order->user_id,
+                        'order_id'        =>  $order->id,
+                        'transaction_id'  =>  $transaction_id,
+                        'total_fee'       =>  $total_fee,
+                        'order_sn'        =>  $order_sn,
+                    ];
+                    $payLogModel = new \app\api\model\OrderPayLog();
+                    $payLogModel->insert($payLogData);
+                    $this->orderModel->commit();
+                    return sprintf("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+                } catch (\Exception $e) {
+                    $this->orderModel->rollback();
+                    return msg(100,'',$e->getMessage());
+                }
+
+            }
+        }
+    }
 }

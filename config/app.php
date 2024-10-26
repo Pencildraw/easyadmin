@@ -54,7 +54,7 @@ return [
         'appsecret' => 'd084a523745c32c3c09b1db5515e1ce5',
         'mch_id' => '1656083885', 
         'secret_key' => 'DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3', //V2、V3秘钥
-        'notify_url' => 'http://www.jingxiaoshang.com/api/order/notify', //支付回调
+        'notify_url' => 'http://www.jingxiaoshang.com/api/order/orderNotify', //支付回调
         'prcode_url' => 'http://www.jingxiaoshang.com/api/index/index', //二维码路径
     ],
 ];

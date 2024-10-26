@@ -27,10 +27,8 @@ class Login extends ApiController
     public function __construct(App $app)
     {
         parent::__construct($app);
-
         // 控制器初始化
         $this->initialize();
-        // 初始化时自定义方法
     }
 
     // 初始化

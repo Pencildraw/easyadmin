@@ -92,3 +92,9 @@ function objToArray($obj)
 {
     return json_decode(json_encode($obj), true);
 }
+//生成批次以及订单号
+function generateNumber($key=0) {
+    $suffix = (time()+$key)+mt_rand(1000, 9999); // 可以根据需要添加日期或其他信息
+    $random = mt_rand(100000, 999999); // 可以根据需要添加随机数
+    return $suffix . $random;
+}
