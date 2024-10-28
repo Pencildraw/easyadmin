@@ -76,6 +76,7 @@ class Order extends ApiController
         //     'user_name.max' => ':attribute不能超过5位!',
         // ];
         $this->validate($post, $rule,[]);
+        $create_time = time();
         // 主订单
         $orderData = [
             'order_status' => 0,
@@ -91,6 +92,7 @@ class Order extends ApiController
             'identity_id' => $this->identity['id'], //经销商ID
             'remark' => $post['remark'] ??'',
             'order_sn' => generateNumber(),
+            'create_time' => $create_time,
         ];
         // 订单商品
         $goodsModel = new goodsModel();
@@ -109,6 +111,7 @@ class Order extends ApiController
             'goods_num' => $post['num'],
             'salesman_remind' => $goodsData['salesman_remind'],
             'shipping_cost' => $goodsData['shipping_cost'],
+            'create_time' => $create_time,
         ];
 
         // $orderModel = new orderModel;

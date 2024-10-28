@@ -1,7 +1,14 @@
 
 http://www.jingxiaoshang.com/admin/index
+https://hosj4bb2pabe-5768.beijing-02.dayunet.com/admin/
 admin
-admin
+123456
+
+经销商api文档地址: https://doc.apipost.net/docs/detail/3660d6c7c8ec000?target_id=221f5b93788001&locale=zh-cn
+密码: 875533
+
+api接口前缀: https://hosj4bb2pabe-5768.beijing-02.dayunet.com/api/
+
 
 crud
 php think curd -t mall_order -c dealer/order -m dealer/order
@@ -44,3 +51,6 @@ return msg(200,'获取成功',$result);
 
 i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.password,i.user_id,i.shop_address
     
+
+    
+

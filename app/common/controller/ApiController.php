@@ -24,14 +24,14 @@ class ApiController extends BaseController
         $token = $this->request->header('x-access-token');
         // var_dump($token); exit;
         if(!isset($token) || $token == ''){
-            echo json_encode(['code'=>100,'msg'=>'请先登录','data'=>'']);
+            echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
             exit;
         }
         // 验证身份
         $identity = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
         $identityInfo = (new \app\api\model\Identity())->identityInfo(objToArray($identity));
         if(!$identityInfo){
-            echo json_encode(['code'=>100,'msg'=>'请先登录','data'=>'']);
+            echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
             exit;
         }
         // 全局身份信息

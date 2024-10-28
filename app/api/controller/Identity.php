@@ -36,13 +36,37 @@ class Identity extends ApiController
             ->where('i.user_id',$this->identity['user_id'])
             ->where('i.status',1)
             ->where('u.status',1)
-            ->field('i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_address')
+            ->field('i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_name,i.shop_address')
             ->find()->toArray();
         if (empty($identityData)) {
             return msg(100,'获取失败',''); 
         } else {
             $typeList = $this->identityModel->typeList();
             $identityData['type_title'] = $typeList[$identityData['type']] ??'';
+            // 用户订单汇总
+            $orderModel = new \app\api\model\Order();
+            if ($orderModel->where('user_id',$this->identity['user_id'])->count() <1) {
+                $order['sum_order'] = 0; //订单总数
+                $order['sum_amount'] = 0; //订单总销售额
+                $order['monther_order'] = 0; //月订单总数
+                $order['monther_order'] = 0; //月订单总销售额
+            } else {
+                $orderSum = $orderModel->where('user_id',$this->identity['user_id'])
+                    ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount')
+                    ->select()->toArray();
+                // 当前月订单 销售额
+                $currentDate = strtotime(date('Y').'-'.date('m').'-'.'01'); //当前月份时间戳
+                $orderMonther = $orderModel->where('user_id',$this->identity['user_id'])
+                    ->where([['create_time','>=',$currentDate]])
+                    ->field('count(id) as monther_order ,sum(ok_amount) as monther_amount')
+                    ->select()->toArray();
+                $order['sum_order'] = $orderSum[0]['sum_order']??0;
+                $order['sum_amount'] = $orderSum[0]['sum_amount'] ??0.00;
+                $order['monther_order'] = $orderMonther[0]['monther_order'] ??0;
+                $order['monther_amount'] = $orderMonther[0]['monther_amount'] ??0.00;
+            }
+            $identityData['order'] = $order;
+            
             return msg(200,'获取成功',$identityData);
         }
     }
@@ -76,4 +100,73 @@ class Identity extends ApiController
         $this->identityModel->commit();
         return msg(200,'保存成功','');
     }    
+
+    // 创建
+    public function createShop(){
+        $post = $this->request->post();
+        $rule = [
+            'name|名称(账号)'       => 'require',
+            'shop_name|店铺名称'       => 'require',
+            'shop_phone|店铺手机号'       => 'require',
+            'shop_address|店铺地址'       => 'require',
+            'head_image|头像'       => 'require',
+        ];
+        // $message = [
+        //     'user_name.max' => ':attribute不能超过5位!',
+        // ];
+        $this->validate($post, $rule,[]);
+
+        $goodsModel = new \app\api\model\Goods;
+        $goods_id = $goodsModel::where('is_default',1)->where('status',1)->value('id');
+        if (!$goods_id) {
+            return msg(100,'关联商品已下架,无法添加店铺',$post);
+        }
+        $type = 4; //店铺类别
+        // 店铺信息
+        $identityData = [
+            'name' => $post['name'],
+            'phone' => $post['shop_phone'],
+            'supplier_id' => $this->supplier_id,
+            // 'dealer_id' => 0,
+            // 'salesman_id' => 0,
+            'goods_id' => $goods_id,
+            // 'qrcode_image' => 0,
+            'type' => 4, //店铺
+            'head_image' => $post['head_image'],
+            // 'binding_status' => 0,
+            'password' => md5(md5(123456)),
+            // 'user_id' => $this->identity['user_id'],
+            'shop_name' => $post['shop_name'],
+            'shop_address' => $post['shop_address'],
+        ];
+        // print_r($identityData); exit;
+        //事务
+        $this->identityModel->startTrans();
+        try {
+            $insertGetId = $this->identityModel->insertGetId($identityData);
+            if (!$insertGetId) {
+                $this->identityModel->rollback();
+                throw new \Exception('店铺添加错误');
+            }
+            // 生成商品二维码
+            // $insertGetId = 1;
+            $prcodeService = new \app\admin\service\QrcodeService;
+            $result = $prcodeService->generate($insertGetId ,$type ,$goods_id);
+            if (!$result['code'] || empty($result['qrcode_image'])) {
+                $this->identityModel->rollback();
+                throw new \Exception('店铺商品二维码创建失败');
+            }
+            $web_url = Config::get('app')['const_data']['web_url'];
+            if (!$this->identityModel->where('id',$insertGetId)->update(['qrcode_image'=> $web_url.$result['qrcode_image']])) {
+                $this->identityModel->rollback();
+                throw new \Exception('店铺修改错误');
+            }
+
+        } catch (\Exception $e) {
+            $this->identityModel->rollback();
+            return msg(100,'保存失败: '.$e->getMessage(),$post); 
+        }
+        $this->identityModel->commit();
+        return msg(200,'保存成功','',$insertGetId);
+    }
 }

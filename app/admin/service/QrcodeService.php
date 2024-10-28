@@ -24,13 +24,16 @@ class QrcodeService
 {
     /**
      * @NodeAnotation(title="生成二维码")
+     * identity_id      身份ID
+     * type             类别
+     * goods_id         商品ID
      */
-    public function generate($level = 0 ,$goods_id = 1)  
+    public function generate($identity_id = 0 ,$type = 0 ,$goods_id = 1)  
     {  
         $prcode_url = Config::get('app')['const_data']['prcode_url'];
         // 自定义参数  
         // $text = 'http://www.jingxiaoshang.com/api/index/index?param1=value1&param2=value2';  
-        $text = $prcode_url.'?level='.$level.'&goods_id='.$goods_id;  
+        $text = $prcode_url.'?type='.$type.'&goods_id='.$goods_id.'&identity_id='.$identity_id;  
   
         // 创建 QrCode 对象  
         $qrCode = QrCode::create($text)  

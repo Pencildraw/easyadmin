@@ -23,9 +23,9 @@ class Goods extends ApiController
 {
     // 详情
     public function info(){
-        // $params = $this->request->param();
-        $post = $this->request->post();
-        $goods_id = $post['goods_id'] ??0;
+        $params = $this->request->param();
+        // $post = $this->request->post();
+        $goods_id = $params['goods_id'] ??0;
         if (!$goods_id) {
             return msg(100,'商品参数错误','');
         }

@@ -39,6 +39,7 @@ class WebLogin extends ApiController
 
     }
 
+    // 登录
     public function login()
     {
         $post = $this->request->post();
@@ -63,31 +64,48 @@ class WebLogin extends ApiController
         if ($identityModel->where('name',$name)->where('status',1)->count() <1) {
             return msg(100,'不存在账号或已禁用: '.$name,''); 
         }
-        $row = $identityModel->where($whereIs)->find();
-        // print_r($row); exit;
+        $identity = $identityModel->where($whereIs)->find();
+        // print_r($identity); exit;
         // print_r(config('app.jwt.key')); exit;
         $data['token'] = '';
-        if (empty($row)) {
-            return msg(100,'登录失败',''); 
+        if (empty($identity)) {
+            return msg(100,'登录失败: 密码错误!',''); 
         } else {
             $userModel = new \app\api\model\User;
-            $user = $userModel->where('id',$row['user_id'])->where('status',1)->find();
-            if (empty($user)) {
-                return msg(100,'不存在用户或已禁用: '.$row['phone'],''); 
-            }
             $userModel->startTrans();
             try {
-                $user->openid = $post['openid'];
-                $user->save();
+                $user = $userModel->where('openid',$post['openid'])->find();
+                if (empty($user)) {
+                    // return msg(100,'不存在用户或已禁用: '.$identity['phone'],''); 
+                    $userData = [
+                        'openid' => $post['openid'],
+                        'type' => $identity['type'],
+                        'identity_id' => $identity['id'],
+                        'binding_status' => 1,
+                    ];
+                    if (!$userModel->insert($userData)) {
+                        $userModel->rollback();
+                        throw new \Exception('用户信息错误');
+                    }
+                } else {
+                    // $user->openid = $post['openid'];
+                    $user->type = $identity['type'];
+                    $user->identity_id = $identity['id'];
+                    $user->binding_status = 1;
+                    $user->save();  
+                }
+                
             } catch (\Exception $e) {
                 $userModel->rollback();
                 return msg(100,'保存失败:'.$e->getMessage(),'');
             }
             $userModel->commit();
-            $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+            $data['token'] = JWT::encode(array('id'=>$identity['id'],'user_id'=>$identity['user_id'],'phone'=>$identity['phone'],'type'=>$identity['type']), config('app.jwt.key'), 'HS256');
             return msg(200,'登录成功',$data); 
         }
     }
+
+    //获取token
     public function getToken()
     {
         $post = $this->request->post();
@@ -111,6 +129,7 @@ class WebLogin extends ApiController
         return msg(200,'操作成功',$data);
     }
 
+    // code换取用户信息
     public function exchange()  
     {  
         $post = $this->request->post();
@@ -126,12 +145,32 @@ class WebLogin extends ApiController
  
         if (isset($result['errcode'])) {  
             // 处理错误  
-            return msg(100,'获取失败',$result['errmsg']); 
+            return msg(100,'获取失败',$result); 
         }  
  
+        // 添加用户信息
+        // $userModel = new \app\api\model\User();
+        // //事务
+        // $userModel->startTrans();
+        // try {
+        //     $userData = [
+        //         'openid' => $result['openid'],
+        //         'type' => 0,
+        //     ];
+        //     if (!$userModel->insert($userData)) {
+        //         $userModel->rollback();
+        //         throw new \Exception('用户信息错误');
+        //     }
+        // } catch (\Exception $e) {
+        //     $userModel->rollback();
+        //     return msg(100,'获取失败: '.$e->getMessage(),$result); 
+        // }
+        // $userModel->commit();
+        
         return msg(200,'获取成功',$result);
     } 
 
+    // 获取wx用户详细信息
     public function getUserInfo($openid, $sessionKey)  
     {  
         $url = "https://api.weixin.qq.com/sns/userinfo?access_token={$this->getAccessToken($this->appid, $this->appsecret)}&openid={$openid}&lang=zh_CN";  
