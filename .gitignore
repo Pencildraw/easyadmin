@@ -2,7 +2,7 @@
 #/.vscode
 *.log
 #.env
-config/install/lock/install.lock
+# config/install/lock/install.lock
 #/public/upload
 #/public/docs
 #public/conf
