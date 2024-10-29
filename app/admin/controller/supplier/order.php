@@ -19,9 +19,38 @@ class order extends AdminController
     {
         parent::__construct($app);
 
-        $this->model = new \app\admin\model\supplier\order();
+        $this->model = new \app\admin\model\mall\order();
         
     }
 
+    /**
+     * @NodeAnotation(title="列表")
+     */
+    public function index()
+    {
+        if ($this->request->isAjax()) {
+            if (input('selectFields')) {
+                return $this->selectList();
+            }
+            list($page, $limit, $where) = $this->buildTableParames();
+            $count = $this->model
+                ->where($where)
+                ->count();
+            $list = $this->model
+                ->where($where)
+                ->page($page, $limit)
+                ->order($this->sort)
+                ->select();
+            $data = [
+                'code'  => 0,
+                'msg'   => '',
+                'count' => $count,
+                'data'  => $list,
+            ];
+            return json($data);
+        }
+        $this->layoutBgColor();
+        return $this->fetch();
+    }
     
 }

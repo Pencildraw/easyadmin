@@ -13,6 +13,10 @@
 namespace think;
 
 require __DIR__ . '/../vendor/autoload.php';
+//跨域
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Request-Method: GET,POST,OPTIONS");
 
 // 声明全局变量
 define('DS', DIRECTORY_SEPARATOR);

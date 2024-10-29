@@ -2,7 +2,7 @@
 // 用户
 namespace app\api\controller;
  
-use app\common\controller\ApiController;
+// use app\common\controller\BaseController;
 use think\App;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
@@ -13,21 +13,12 @@ use think\facade\Http;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class WebLogin extends ApiController
+class WebLogin extends BaseController
 {
     protected $appid;  
     protected $appsecret;  
     protected $access_token_url;  
     protected $limit_page;  
-  
-    public function __construct(App $app)
-    {
-        parent::__construct($app);
-
-        // 控制器初始化
-        $this->initialize();
-        // 初始化时自定义方法
-    }
 
     // 初始化
     public function initialize()
@@ -101,6 +92,8 @@ class WebLogin extends ApiController
             }
             $userModel->commit();
             $data['token'] = JWT::encode(array('id'=>$identity['id'],'user_id'=>$identity['user_id'],'phone'=>$identity['phone'],'type'=>$identity['type']), config('app.jwt.key'), 'HS256');
+            $data['type'] = $identity['type'];
+            $data['type_title'] = $identityModel->typeList()[$identity['type']];
             return msg(200,'登录成功',$data); 
         }
     }
