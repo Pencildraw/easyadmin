@@ -98,3 +98,24 @@ SimpleXMLElement Object
 	经销商token (后改为业务员)
 	eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTMsInVzZXJfaWQiOjMsInBob25lIjoiMTM5NTM0NTY0NTQ1IiwidHlwZSI6Mn0.pxLgdrPehSulBbKpvgTaOCVRwegvn8tCpypk-qRVNq0
 
+Array
+(
+    [nonceStr] => SimpleXMLElement Object
+        (
+            [0] => siM6qKDuImWS2NFn
+        )
+
+    [timeStamp] => 1730257385
+    [package] => prepay_id=wx30110304750904b801b510e0ee2a520001
+    [signType] => MD5
+    [paySign] => 542c2a9a9b42119e9a7cf294c42d8979
+)
+处理成
+Array
+(
+    [nonceStr] => siM6qKDuImWS2NFn
+    [timeStamp] => 1730257385
+    [package] => prepay_id=wx30110304750904b801b510e0ee2a520001
+    [signType] => MD5
+    [paySign] => 542c2a9a9b42119e9a7cf294c42d8979
+)

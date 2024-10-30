@@ -16,6 +16,7 @@ use think\Request;
 use think\facade\Config;
 use think\facade\Cache;  
 use think\facade\Http;  
+use EasyWeChat\Factory;
 
 class Pay extends ApiController
 {
@@ -88,42 +89,46 @@ class Pay extends ApiController
         
         // 解析响应数据
         $responseData = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA);
-        // print_r($responseData); exit;
-        
-        if ($responseData->return_code == 'SUCCESS' && $responseData->result_code == 'SUCCESS') {
+        // object转array
+        $res = objToArray($responseData);
+        if ($res['return_code'] == 'SUCCESS' && $res['result_code'] == 'SUCCESS') {
+            $pay_time = time();
             // 返回前端需要的参数
-            $payData = [
-                'appId' => $responseData->appid,
-                'timeStamp' => time(),
-                'nonceStr' => $responseData->nonce_str,
-                'package' => 'prepay_id=' . $responseData->prepay_id,
-                'signType' => 'MD5',
-                'paySign' => $this->generateSign([
-                    'appId' => $responseData->appid,
-                    'timeStamp' => time(),
-                    'nonceStr' => $responseData->nonce_str,
-                    'package' => 'prepay_id=' . $responseData->prepay_id,
-                    'signType' => 'MD5',
-                ]),
+            // $payData = [
+            //     'appId' => $res['appid,
+            //     'timeStamp' => time(),
+            //     'nonceStr' => $res['nonce_str,
+            //     'package' => 'prepay_id=' . $res['prepay_id,
+            //     'signType' => 'MD5',
+            //     'paySign' => $this->generateSign([
+            //         'appId' => $res['appid,
+            //         'timeStamp' => time(),
+            //         'nonceStr' => $res['nonce_str,
+            //         'package' => 'prepay_id=' . $res['prepay_id,
+            //         'signType' => 'MD5',
+            //     ]),
+            // ];
+            $config = [
+                // 必要配置
+                'app_id'             => $this->appid,
+                'mch_id'             => $this->mch_id,
+                'key'                => Config::get('app')['const_data']['secret_key'],   // API v2 密钥 (注意: 是v2密钥 是v2密钥 是v2密钥)
+                'notify_url'         => Config::get('app')['const_data']['notify_url'],     // 你也可以在下单时单独设置来想覆盖它
             ];
-            // $paySign   = md5("appId=$appId&nonceStr=$nonceStr&package=prepay_id=$prepay_id&signType=MD5&timeStamp=$timeStamp&key=$key"); // 这个地方就是我所说的二次签名！
-
-            // "data": {
-            //     "nonceStr": "xXOgmoYvy9nBpCDx",
-            //     "timeStamp": "1701314412",
-            //     "package": "prepay_id=wx30112013748902240b3fdbd40d09ee0000",
-            //     "paySign": "95210211d4b875f302cad8a97cbe1360",
-            //     "signType": "MD5"
-            // },
+            $wxpay = Factory::payment($config);
+            $key       = $wxpay->config->key;
+            $paySign   = md5("appId={$res['appid']}&nonceStr={$res['nonce_str']}&package=prepay_id={$res['prepay_id']}&signType=MD5&timeStamp=$pay_time&key=$key"); // 这个地方就是我所说的二次签名！
             $payData = [
-                'nonceStr'  => $responseData->nonce_str,
-                'timeStamp' => time(),
-                'package'   => 'prepay_id=' . $responseData->prepay_id,
-                "signType"  => "MD5"
+                'nonceStr'  => $res['nonce_str'],
+                'timeStamp' => $pay_time,
+                'package'   => 'prepay_id=' . $res['prepay_id'],
+                "signType"  => "MD5",
+                "paySign"   => $paySign,
             ];
+            // print_r($payData); exit;
             return msg(200,'下单成功',$payData);
         } else {
-            // Log::error('统一下单失败: ' . $responseData->return_msg);
+            // Log::error('统一下单失败: ' . $res['return_msg']);
             return msg(100,'下单失败','');
         }
     }
