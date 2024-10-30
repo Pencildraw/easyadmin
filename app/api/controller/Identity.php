@@ -136,6 +136,7 @@ class Identity extends ApiController
             // 'binding_status' => 0,
             'password' => md5(md5(123456)),
             // 'user_id' => $this->identity['user_id'],
+            'salesman_id' => $this->identity['id'], //业务员ID
             'shop_name' => $post['shop_name'],
             'shop_address' => $post['shop_address'],
         ];
