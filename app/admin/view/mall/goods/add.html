@@ -4,67 +4,46 @@
         <div class="layui-form-item">
             <label class="layui-form-label">商品名称</label>
             <div class="layui-input-block">
-                <input type="text" name="name" class="layui-input"  placeholder="请输入商品名称" value="">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">价格</label>
-            <div class="layui-input-block">
-                <input type="text" name="price" class="layui-input"  placeholder="请输入价格" value="0.00">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">描述</label>
-            <div class="layui-input-block">
-                <input type="text" name="attr" class="layui-input"  placeholder="请输入描述" value="">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">装填</label>
-            <div class="layui-input-block">
-                <input type="text" name="status" class="layui-input"  placeholder="请输入装填" value="0">
+                <input type="text" name="name" class="layui-input" lay-verify="required" placeholder="请输入商品名称" value="">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">进价</label>
             <div class="layui-input-block">
-                <input type="text" name="purchase_price" class="layui-input" lay-verify="required" placeholder="请输入进价" value="0.00">
+                <input type="text" name="purchase_price" class="layui-input" lay-verify="required" placeholder="请输入进价" value="">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">库存</label>
+            <label class="layui-form-label">售价</label>
             <div class="layui-input-block">
-                <input type="text" name="inventory" class="layui-input"  placeholder="请输入库存" value="0">
+                <input type="text" name="price" class="layui-input" lay-verify="required" placeholder="请输入价格" value="">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">销量</label>
+            <label class="layui-form-label">运营物流费</label>
             <div class="layui-input-block">
-                <input type="text" name="sales_volume" class="layui-input"  placeholder="请输入销量" value="0">
+                <input type="text" name="shipping_cost" class="layui-input" lay-verify="required" placeholder="请输入发货费用" value="">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">商品分类ID</label>
+            <label class="layui-form-label">描述</label>
             <div class="layui-input-block">
-                <input type="text" name="cate_id" class="layui-input"  placeholder="请输入商品分类ID" value="1">
+                <textarea type="text" name="attr" class="layui-input" lay-verify="required" style="height:50px;" placeholder="请输入描述" value=""></textarea>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">供应商ID</label>
-            <div class="layui-input-block">
-                <input type="text" name="supplier_id" class="layui-input"  placeholder="请输入供应商ID" value="">
+            <label class="layui-form-label required">商品图片</label>
+            <div class="layui-input-block layuimini-upload">
+                <input autocomplete="off" name="images" lay-verify="required" class="layui-input layui-col-xs3"   placeholder="请上传商品图片" value="">
+                <div class="layuimini-upload-btn">
+                    <span><a class="layui-btn"  data-upload="images" data-upload-number="many" data-upload-exts="png|jpg|ico|jpeg" data-upload-icon="image"><i class="fa fa-upload"></i> 上传</a></span>
+                </div>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">业务员提点</label>
+            <label class="layui-form-label">商品详情</label>
             <div class="layui-input-block">
-                <input type="text" name="salesman_remind" class="layui-input"  placeholder="请输入业务员提点" value="0.00">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">发货费用</label>
-            <div class="layui-input-block">
-                <input type="text" name="shipping_cost" class="layui-input"  placeholder="请输入发货费用" value="0.00">
+                <textarea name="content" rows="20" class="layui-textarea editor" 商品详情 placeholder="请输入商品详情"></textarea>
             </div>
         </div>
         <div class="hr-line"></div>
