@@ -52,5 +52,49 @@ return msg(200,'获取成功',$result);
 i.id,i.name,i.phone,i.email,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.password,i.user_id,i.shop_address
     
 
-    
+http://192.168.2.31:8080/?code=0110WT000DIp6T1J10300ZjPSA10WT02&state=1#/pages/login/login
+http://192.168.2.185:8080/?code=0110WT000DIp6T1J10300ZjPSA10WT02&state=1#/pages/login/login
+
+"openid": oyVdK6kIyencLPwO1xMq7JxYpN9A
+{
+	"code": 200,
+	"msg": "获取成功",
+	"data": {
+		"access_token": "85_zqSCtUZEm2sJbXcHuD1oCvdJsw02Zc1c4AIfWU52a44msZDVrLagG1K2aYpkN-OgnG7wTDtUzOvRtYjmMx0ODgNM-TfNkIxr_X485RMHWXs",
+		"expires_in": 7200,
+		"refresh_token": "85_0kMypgKXPGT2vwfFSfr_F0Dx4wB4EyBlFvFhc1918sBbqUGlp0HKucvGd2yz6BjWntOJy9oAS2g0bUOLq4ZsPMhpakabs9iuDxYuxLoVryA",
+		"openid": "on2Xq6IY9mP1s-VZ4adqu6MPM-Zc",
+		"scope": "snsapi_base"
+	}
+}
+
+SimpleXMLElement Object
+(
+    [return_code] => SUCCESS
+    [return_msg] => OK
+    [result_code] => SUCCESS
+    [mch_id] => 1656083885
+    [appid] => wx49d709d931c6a99b
+    [nonce_str] => D7Spt1nVKMBvZM2U
+    [sign] => BEF63EE06F25947EFB63C48648B0ABEC
+    [prepay_id] => wx2914020794666590ccd757dc611b6b0001
+    [trade_type] => JSAPI
+)
+
+{
+	"code": 200,
+	"data": {
+		"nonceStr": "xXOgmoYvy9nBpCDx",
+		"timeStamp": "1701314412",
+		"package": "prepay_id=wx30112013748902240b3fdbd40d09ee0000",
+		"paySign": "95210211d4b875f302cad8a97cbe1360",
+		"signType": "MD5"
+	},
+	"msg": "获取微信预支付信息成功"
+}
+
+	普通用户token
+	eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTQsInVzZXJfaWQiOjQsInBob25lIjoiIiwidHlwZSI6NX0.fC3XV6N6rlhxj9wzyVikXMhjku8mqCMfrNmGdbU7hfg
+	经销商token (后改为业务员)
+	eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTMsInVzZXJfaWQiOjMsInBob25lIjoiMTM5NTM0NTY0NTQ1IiwidHlwZSI6Mn0.pxLgdrPehSulBbKpvgTaOCVRwegvn8tCpypk-qRVNq0
 

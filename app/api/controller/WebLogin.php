@@ -74,17 +74,23 @@ class WebLogin extends BaseController
                         'identity_id' => $identity['id'],
                         'binding_status' => 1,
                     ];
-                    if (!$userModel->insert($userData)) {
+                    $insertGetId = $userModel->insertGetId($userData);
+                    if (!$insertGetId) {
                         $userModel->rollback();
                         throw new \Exception('用户信息错误');
                     }
+                    $user_id = $insertGetId;
                 } else {
                     // $user->openid = $post['openid'];
                     $user->type = $identity['type'];
                     $user->identity_id = $identity['id'];
                     $user->binding_status = 1;
                     $user->save();  
+                    $user_id = $user->id;
                 }
+                $identity->user_id = $user_id;
+                $identity->binding_status = 1;
+                $identity->save(); 
                 
             } catch (\Exception $e) {
                 $userModel->rollback();
@@ -111,13 +117,41 @@ class WebLogin extends BaseController
         $user = $userModel->where(['openid'=>$post['openid'],'status'=>1])->find();
 
         $data['token'] = '';
-        if($user && $user['id']){
+        if($user && isset($user->id)){
             $identityModel = new \app\api\model\Identity;
-            if ($identityModel->where('user_id',$user['id'])->where('status',1)->count() <1) {
-                return msg(100,'不存在账号或已禁用: '.$user['name'],''); 
+            if ($identityModel->where('user_id',$user->id)->where('status',1)->count() <1) {
+                // return msg(100,'不存在账号或已禁用: '.$user['name'],'');
+                // 普通用户token
+                //事务
+                $identityModel->startTrans();
+                try {
+                    $identityData = [
+                        'create_time' => time(),
+                        'type' => 5,
+                        'binding_status' => 1,
+                        'user_id' => $user->id,
+                    ];
+                    $insertGetId = $identityModel->insertGetId($identityData);
+                    // 关联用户信息
+                    $user->identity_id = $insertGetId;
+                    $user->binding_status = 1;
+                    if (!$insertGetId || !$user->save()) {
+                        $identityModel->rollback();
+                        throw new \Exception('保存失败');
+                    }
+
+                } catch (\Exception $e) {
+                    $identityModel->rollback();
+                    return msg(100,'用户身份信息保存失败','');
+                }
+                $identityModel->commit();
             }
             $row = $identityModel->where('user_id',$user['id'])->find();
             $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+            $data['type'] = $row['type'];
+            $data['type_title'] = $identityModel->typeList()[$row['type']];
+        } else {
+            return msg(100,'系统不存在该用户','');
         }
         return msg(200,'操作成功',$data);
     }
@@ -142,24 +176,23 @@ class WebLogin extends BaseController
         }  
  
         // 添加用户信息
-        // $userModel = new \app\api\model\User();
-        // //事务
-        // $userModel->startTrans();
-        // try {
-        //     $userData = [
-        //         'openid' => $result['openid'],
-        //         'type' => 0,
-        //     ];
-        //     if (!$userModel->insert($userData)) {
-        //         $userModel->rollback();
-        //         throw new \Exception('用户信息错误');
-        //     }
-        // } catch (\Exception $e) {
-        //     $userModel->rollback();
-        //     return msg(100,'获取失败: '.$e->getMessage(),$result); 
-        // }
-        // $userModel->commit();
-        
+        $userModel = new \app\api\model\User();
+        //事务
+        $userModel->startTrans();
+        try {
+            $userData = [
+                'openid' => $result['openid'],
+                'type' => 0,
+            ];
+            if (!$userModel->insert($userData)) {
+                $userModel->rollback();
+                throw new \Exception('用户信息错误');
+            }
+        } catch (\Exception $e) {
+            $userModel->rollback();
+            return msg(100,'获取失败: '.$e->getMessage(),$result); 
+        }
+        $userModel->commit();
         return msg(200,'获取成功',$result);
     } 
 

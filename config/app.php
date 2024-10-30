@@ -33,9 +33,9 @@ return [
     // 异常页面的模板文件
     // 'exception_tmpl'   => Env::get('app_debug') == 1 ? app()->getThinkPath() . 'tpl/think_exception.tpl' : app()->getBasePath() . 'common' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'think_exception.tpl',
     // http异常页面的模板文件
-    'http_exception_template' => [
-        404 => base_path('common' . DIRECTORY_SEPARATOR . 'tpl') . '404.html'
-    ],
+    // 'http_exception_template' => [
+    //     404 => base_path('common' . DIRECTORY_SEPARATOR . 'tpl') . '404.html'
+    // ],
     // 跳转页面的成功模板文件
     'dispatch_success_tmpl'   => app()->getBasePath() . 'common' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'dispatch_jump.tpl',
     // 跳转页面的失败模板文件
@@ -50,10 +50,10 @@ return [
     'const_data'        => [
         // api limit默认10条数据
         'api_limit' => '10',
-        // 'appid' => 'wx49d709d931c6a99b',
-        // 'appsecret' => 'd084a523745c32c3c09b1db5515e1ce5',
-        'appid' => 'wxcedbd1bfa93490ba',
-        'appsecret' => 'db83283b65d7f1db31b04a07123bcc9c',
+        'appid' => 'wx49d709d931c6a99b',
+        'appsecret' => 'd084a523745c32c3c09b1db5515e1ce5',
+        // 'appid' => 'wxcedbd1bfa93490ba',
+        // 'appsecret' => 'db83283b65d7f1db31b04a07123bcc9c',
         'mch_id' => '1656083885', 
         'secret_key' => 'DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3', //V2、V3秘钥
         'notify_url' => 'https://hosj4bb2pabe-5768.beijing-02.dayunet.com/api/order/orderNotify', //支付回调

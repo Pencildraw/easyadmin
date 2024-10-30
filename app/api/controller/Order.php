@@ -197,37 +197,51 @@ class Order extends ApiController
                 // 如果没有找到指定的字符串，原样输出
                 $order_sn = $str;
             }
-            $openid = $message['openid'];                  // 付款人openID
+            // $openid = $message['openid'];                  // 付款人openID
             $total_fee = ($message['total_fee']) / 100;            // 付款金额
             $transaction_id = $message['transaction_id'];  // 微信支付流水号
             $order = $this->orderModel->where(['order_sn' => $order_sn])->find();
+            $payLogModel = new \app\api\model\OrderPayLog(); //支付记录日志
+            $create_time = time();
             if($order){
-                $status = 1; //订单状态 0:待付款 1:已付首款 2:全款已付
-            
+                // $pay_status = 1; //支付类型 {select}  (0:未支付 ,1:已支付)
                 //事务开始
                 $this->orderModel->startTrans();
                 try{
                     $orderData = [
                         'ok_amount'         =>  $total_fee + $order->ok_amount,
-                        'status'            =>  1,
+                        'pay_status'            =>  1,
                     ];
                     $this->orderModel->where('id', $order->id)->update($orderData);
-                    $userModel = new \app\api\model\User();
+                    // $userModel = new \app\api\model\User();
                     $payLogData = [
-                        'order_id'         =>  $order->id,
-                        'user_id'         =>  $order->user_id,
                         'order_id'        =>  $order->id,
+                        'user_id'         =>  $order->user_id,
+                        'identity_id'     =>  $order->identity_id,
                         'transaction_id'  =>  $transaction_id,
                         'total_fee'       =>  $total_fee,
                         'order_sn'        =>  $order_sn,
+                        'pay_status'      =>  1,
+                        'create_time'     =>  $create_time,
                     ];
-                    $payLogModel = new \app\api\model\OrderPayLog();
                     $payLogModel->insert($payLogData);
                     $this->orderModel->commit();
-                    return sprintf("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+                    // return sprintf("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
                 } catch (\Exception $e) {
                     $this->orderModel->rollback();
-                    return msg(100,'',$e->getMessage());
+                    // 订单修改失败记录日志
+                    $payLogData = [
+                        'order_id'        =>  $order->id,
+                        'user_id'         =>  $order->user_id,
+                        'identity_id'     =>  $order->identity_id,
+                        'transaction_id'  =>  $transaction_id,
+                        'total_fee'       =>  $total_fee,
+                        'order_sn'        =>  $order_sn,
+                        'pay_status'      =>  0,
+                        'create_time'     =>  $create_time,
+                    ];
+                    $payLogModel->insert($payLogData);
+                    // return msg(100,'',$e->getMessage());
                 }
 
             }

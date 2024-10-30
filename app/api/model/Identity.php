@@ -16,9 +16,9 @@ class Identity extends TimeModel
     public function identityUser(){
         return $this->hasMany('app\api\model\User','id','user_id')->where('status',1);
     }
-    // 用户类型 {select}  (1:供应商,2:经销商,3:业务员,4:店铺,0:普通用户)
+    // 用户类型 {select}  (1:供应商,2:经销商,3:业务员,4:店铺,5:普通用户)
     public function typeList(){
-        return ['0'=>'普通用户' ,'1'=>'供应商' ,'2'=>'经销商' ,'3'=>'业务员','4'=>'店铺'];
+        return ['5'=>'普通用户' ,'1'=>'供应商' ,'2'=>'经销商' ,'3'=>'业务员','4'=>'店铺'];
     }
     //身份信息 
     public function identityInfo($where){
