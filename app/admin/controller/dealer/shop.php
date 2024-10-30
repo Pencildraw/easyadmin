@@ -36,11 +36,11 @@ class shop extends AdminController
             list($page, $limit, $where) = $this->buildTableParames();
             $count = $this->model
                 ->where($where)
-                ->where('type',2)
+                ->where('type',4)
                 ->count();
             $list = $this->model
                 ->where($where)
-                ->where('type',2)
+                ->where('type',4)
                 ->page($page, $limit)
                 ->order($this->sort)
                 ->select();
@@ -136,8 +136,8 @@ class shop extends AdminController
             $save ? $this->success('保存成功') : $this->error('保存失败');
         }
         $userModel = new user;
-        $user = $userModel->where('status' ,1)->where('binding_status' ,0)->select();
-        $this->assign('user' ,$user);
+        // $user = $userModel->where('status' ,1)->where('binding_status' ,0)->select();
+        // $this->assign('user' ,$user);
         $this->assign('row', $row);
         return $this->fetch();
     }

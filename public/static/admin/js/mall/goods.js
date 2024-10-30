@@ -24,7 +24,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: 'shipping_cost', title: '运营物流费',templet: ea.table.price},
                     {field: 'sales_volume', title: '销量'},
                     {field: 'attr', title: '描述',templet: ea.table.text},
-                    {field: 'create_time', title: '创建时间'},
+                    {field: 'create_time', title: '创建时间', search: 'range',minWidth: 160},
                     {width: 250, title: '操作', templet: ea.table.tool},
 
                 ]],
