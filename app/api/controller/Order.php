@@ -100,6 +100,7 @@ class Order extends ApiController
         if (empty($goodsData)) {
             return msg(100,'商品不存在或已失效',$post); 
         }
+        // 商品
         $specData = [
             'goods_name' => $goodsData['name'],
             'goods_price' => $goodsData['price'],
@@ -113,8 +114,32 @@ class Order extends ApiController
             'shipping_cost' => $goodsData['shipping_cost'],
             'create_time' => $create_time,
         ];
-
-        // $orderModel = new orderModel;
+        // 赠品规则 10-1 20-3 30-5 40-8 ;50以上 买5赠1
+        $giftSpecData = [];
+        if ($post['num'] <= 10) {
+            $gift_num = 0;
+        } else if ($post['num'] >= 40) {
+            $gift_num = intval($post['num']/5);
+        } else {
+            $gift_num = config('app.git_goods')[intval($post['num']/10)*10];
+        }
+        if ($gift_num) {
+            // print_r($gift_num); exit;
+            $giftSpecData = [ 
+                'goods_name' => $goodsData['name'],
+                'goods_price' => $goodsData['price'],
+                'goods_attr' => $goodsData['attr'],
+                'purchase_price' => $goodsData['purchase_price'],
+                'cate_id' => $goodsData['cate_id'],
+                'goods_id' => $goodsData['id'],
+                // 'user_id' => 0,
+                'goods_num' => $gift_num,
+                'salesman_remind' => $goodsData['salesman_remind'],
+                'shipping_cost' => $goodsData['shipping_cost'],
+                'goods_type' => 2, // 赠品
+                'create_time' => $create_time,
+            ];
+        }
         //事务
         $this->orderModel->startTrans();
         try {
@@ -130,6 +155,14 @@ class Order extends ApiController
             if (!$specOrderModel->insert($specData)) {
                 $this->orderModel->rollback();
                 throw new \Exception('订单商品保存失败');
+            }
+            // 订单赠品
+            if (!empty($giftSpecData)) {
+                $giftSpecData['order_id'] = $insertGetId;
+                if (!$specOrderModel->insert($giftSpecData)) {
+                    $this->orderModel->rollback();
+                    throw new \Exception('订单赠品保存失败');
+                }
             }
 
         } catch (\Exception $e) {
