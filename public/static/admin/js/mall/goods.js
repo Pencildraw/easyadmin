@@ -16,7 +16,17 @@ define(["jquery", "easy-admin"], function ($, ea) {
             ea.table.render({
                 init: init,
                 cols: [[
-                    {type: 'checkbox'},                    {field: 'id', title: '商品表'},                    {field: 'name', title: '商品名称'},                    {field: 'price', title: '价格'},                    {field: 'attr', title: '描述'},                    {field: 'status', title: '装填', templet: ea.table.switch},                    {field: 'purchase_price', title: '进价'},                    {field: 'create_time', title: '创建时间'},                    {field: 'inventory', title: '库存'},                    {field: 'sales_volume', title: '销量'},                    {field: 'cate_id', title: '商品分类ID'},                    {field: 'supplier_id', title: '供应商ID'},                    {field: 'salesman_remind', title: '业务员提点'},                    {field: 'shipping_cost', title: '发货费用'},                    {width: 250, title: '操作', templet: ea.table.tool},
+                    {type: 'checkbox'},
+                    {field: 'name', title: '商品名称'},
+                    {field: 'images', title: '主图', templet: ea.table.lazyimg},
+                    {field: 'price', title: '价格', templet: ea.table.price},
+                    {field: 'purchase_price', title: '进价', templet: ea.table.price},
+                    {field: 'shipping_cost', title: '运营物流费',templet: ea.table.price},
+                    {field: 'sales_volume', title: '销量'},
+                    {field: 'attr', title: '描述',templet: ea.table.text},
+                    {field: 'create_time', title: '创建时间'},
+                    {width: 250, title: '操作', templet: ea.table.tool},
+
                 ]],
             });
 
