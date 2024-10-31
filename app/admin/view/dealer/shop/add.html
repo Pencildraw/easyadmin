@@ -19,12 +19,12 @@
                 <input type="text" name="phone" class="layui-input"  placeholder="请输入联系方式" value="" lay-verify="required">
             </div>
         </div>
-        <div class="layui-form-item">
+        <!-- <div class="layui-form-item">
             <label class="layui-form-label">邮件</label>
             <div class="layui-input-block">
                 <input type="text" name="email" class="layui-input"  placeholder="请输入邮件" value="">
             </div>
-        </div>
+        </div> -->
         <!-- <div class="layui-form-item">
             <label class="layui-form-label">状态</label>
             <div class="layui-input-block">
@@ -36,7 +36,7 @@
             <div class="layui-input-block">
                 <select name="type" disabled="disabled">
                     {foreach $typeList as $k=>$v}
-                    <option value='{$k}' {in name="k" value="2"}selected=""{/in}>{$v}</option>
+                    <option value='{$k}' {in name="k" value="3"}selected=""{/in}>{$v}</option>
                     {/foreach}
                 </select>
             </div>
@@ -46,18 +46,7 @@
             <div class="layui-input-block">
                 <select name="goods_id" disabled="disabled">
                     {foreach $goods as $k=>$v}
-                    <option value='{$v.id}' {in name="k" value="1"}selected=""{/in}>{$v.name}</option>
-                    {/foreach}
-                </select>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">绑定用户</label>
-            <div class="layui-input-block">
-                <select name="user_id">
-                    <option value=''>--请选择用户--</option>
-                    {foreach $user as $k=>$v}
-                    <option value='{$v.id}'>{$v.name}</option>
+                    <option value='{$v.id}' {in name="k" value="4"}selected=""{/in}>{$v.name}</option>
                     {/foreach}
                 </select>
             </div>

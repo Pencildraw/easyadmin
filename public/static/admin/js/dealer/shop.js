@@ -15,15 +15,17 @@ define(["jquery", "easy-admin"], function ($, ea) {
         index: function () {
             ea.table.render({
                 init: init,
-                toolbar:['add'],
+                toolbar:[],
                 defaultToolbar:['filter'],
                 cols: [[
                     {type: 'checkbox'},
                     {field: 'name', title: '名称(账号)'},
                     {field: 'phone', title: '联系方式'},
                     {field: 'status', title: '状态', templet: ea.table.switch},
-                    {field: 'goods_id', title: '代理商品'},
-                    {field: 'create_time', title: '创建时间'},
+                    // {field: 'goods_id', title: '代理商品'},
+                    {field: 'shop_name', title: '店铺名称'},
+                    {field: 'shop_address', title: '店铺地址'},
+                    {field: 'create_time', minWidth: 80, title: '创建时间', search: 'range'},
                     {width: 250, title: '操作', templet: ea.table.tool
                         ,operat:['edit']
                     },

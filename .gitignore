@@ -4,8 +4,7 @@
 #.env
 # config/install/lock/install.lock
 #/public/upload
-/public/uploads
-/public/qrcode
+/public
 #/public/docs
 #public/conf
 public/WowOss.exe
