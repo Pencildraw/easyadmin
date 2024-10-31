@@ -20,22 +20,24 @@ class ApiController extends BaseController
     protected function initialize()
     {
         parent::initialize();
-        //验证登录
-        $token = $this->request->header('x-access-token');
-        // var_dump($token); exit;
-        if(!isset($token) || $token == ''){
-            echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
-            exit;
+        if(!$this->checkLogin()){
+            //验证登录
+            $token = $this->request->header('x-access-token');
+            // var_dump($token); exit;
+            if(!isset($token) || $token == ''){
+                echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
+                exit;
+            }
+            // 验证身份
+            $identity = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
+            $identityInfo = (new \app\api\model\Identity())->identityInfo(objToArray($identity));
+            if(!$identityInfo){
+                echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
+                exit;
+            }
+            // 全局身份信息
+            $this->identity = objToArray($identity);
         }
-        // 验证身份
-        $identity = JWT::decode($token, new Key(config('app.jwt.key'), 'HS256'));
-        $identityInfo = (new \app\api\model\Identity())->identityInfo(objToArray($identity));
-        if(!$identityInfo){
-            echo json_encode(['code'=>401,'msg'=>'请先登录','data'=>'']);
-            exit;
-        }
-        // 全局身份信息
-        $this->identity = objToArray($identity);
     }
     // public function checkUser()
     // {

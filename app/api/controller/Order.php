@@ -155,7 +155,7 @@ class Order extends ApiController
             'order_address' => $post['order_name'],
             'total_amount' => $post['total_amount'],
             'order_amount' => $post['total_amount'],
-            'ok_amount' => $post['ok_amount'],
+//            'ok_amount' => $post['ok_amount'],
             'supplier_id' => $this->supplier_id, //供应商ID
             // 'dealer_id' => $this->dealer_id, //经销商ID
             'identity_id' => $this->identity['id'], //经销商ID
@@ -260,6 +260,7 @@ class Order extends ApiController
             $this->orderModel->rollback();
             return msg(100,'保存失败',$post);
         }
+        $this->orderModel->commit();
         return msg(200,'保存成功',['order_id'=>$row->id]);
     }
     
@@ -294,11 +295,17 @@ class Order extends ApiController
                 //事务开始
                 $this->orderModel->startTrans();
                 try{
-                    $orderData = [
-                        'ok_amount'         =>  $total_fee + $order->ok_amount,
-                        'pay_status'            =>  1,
-                    ];
-                    $this->orderModel->where('id', $order->id)->update($orderData);
+//                    $orderData = [
+//                        'ok_amount'         =>  $total_fee + $order->ok_amount,
+//                        'pay_status'            =>  1,
+//                        'transaction_id'            =>  $transaction_id,
+//                    ];
+                    $order->ok_amount = $total_fee;
+                    $order->pay_status = 1;
+                    $order->transaction_id = $transaction_id;
+//                    $order->update_time = $create_time;
+                    $order->save();
+//                    $this->orderModel->where('id', $order->id)->update($orderData);
                     // $userModel = new \app\api\model\User();
                     $payLogData = [
                         'order_id'        =>  $order->id,
@@ -311,25 +318,25 @@ class Order extends ApiController
                         'create_time'     =>  $create_time,
                     ];
                     $payLogModel->insert($payLogData);
-                    $this->orderModel->commit();
                     // return sprintf("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
                 } catch (\Exception $e) {
                     $this->orderModel->rollback();
                     // 订单修改失败记录日志
-                    $payLogData = [
-                        'order_id'        =>  $order->id,
-                        'user_id'         =>  $order->user_id,
-                        'identity_id'     =>  $order->identity_id,
-                        'transaction_id'  =>  $transaction_id,
-                        'total_fee'       =>  $total_fee,
-                        'order_sn'        =>  $order_sn,
-                        'pay_status'      =>  0,
-                        'create_time'     =>  $create_time,
-                    ];
-                    $payLogModel->insert($payLogData);
-                    // return msg(100,'',$e->getMessage());
+//                    $payLogData = [
+//                        'order_id'        =>  $order->id,
+//                        'user_id'         =>  $order->user_id,
+//                        'identity_id'     =>  $order->identity_id,
+//                        'transaction_id'  =>  $transaction_id,
+//                        'total_fee'       =>  $total_fee,
+//                        'order_sn'        =>  $order_sn,
+//                        'pay_status'      =>  0,
+//                        'create_time'     =>  $create_time,
+//                    ];
+//                    $payLogModel->insert($payLogData);
+//                        exit;
+                    return msg(100,'',$e->getMessage());
                 }
-
+                $this->orderModel->commit();
             }
         }
     }

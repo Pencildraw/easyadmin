@@ -6,5 +6,5 @@ use app\common\model\TimeModel;
 
 class OrderPayLog extends TimeModel
 {
-    protected $name = "ea_mall_order_pay_log";
+    protected $name = "mall_order_pay_log";
 }
