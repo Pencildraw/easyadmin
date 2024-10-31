@@ -38,11 +38,20 @@ class order extends AdminController
                 ->where('pay_status',1)
                 ->count();
             $list = $this->model
+                ->field('ea_mall_order.* 
+                    ,(SELECT name FROM ea_company_identity WHERE id = ea_mall_order.supplier_id) AS identity_supplier
+                    ,(SELECT phone FROM ea_company_identity WHERE id = ea_mall_order.supplier_id) AS supplier_phone
+                    ,(SELECT name FROM ea_company_identity WHERE id = ea_mall_order.shop_id) AS identity_shop
+                    ,(SELECT phone FROM ea_company_identity WHERE id = ea_mall_order.shop_id) AS shop_phone
+                ')
+                // ,(SELECT name FROM ea_company_identity WHERE id = ea_mall_order.shop_id) AS identity_shop 
                 ->where($where)
                 // ->where('pay_status',1)s
                 ->page($page, $limit)
                 ->order($this->sort)
+                // ->fetchsql(true)
                 ->select();
+            // print_r($list); exit;
             $data = [
                 'code'  => 0,
                 'msg'   => '',

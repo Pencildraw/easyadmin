@@ -43,9 +43,19 @@ class shop extends AdminController
             $list = $this->model
                 ->where($where)
                 ->where('type',4)
+                ->field('ea_company_identity.* 
+                    ,(SELECT name FROM ea_company_identity WHERE id = ea_company_identity.supplier_id) AS identity_supplier 
+                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_order 
+                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_order_price
+                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_goods_num
+                ')
                 ->page($page, $limit)
                 ->order($this->sort)
                 ->select();
+            $identityDealer = $this->model->where('type',2)->where('status',1)->find();
+            foreach ($list as $key => &$value) {
+                $value->idntity_dealer = $identityDealer->name;
+            }
             $data = [
                 'code'  => 0,
                 'msg'   => '',
