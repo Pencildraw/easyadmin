@@ -170,4 +170,28 @@ class Identity extends ApiController
         $this->identityModel->commit();
         return msg(200,'保存成功','',$insertGetId);
     }
+    //店铺列表
+    public function shopList(){
+        $post = $this->request->post();
+        $rule = [
+            'page|页数'       => 'require',
+            'limit|条数'       => 'require',
+        ];
+        $this->validate($post, $rule,[]);
+        $where = [
+            ['salesman_id','=',$this->identity['id']]
+        ];
+        $list= $this->identityModel
+            ->where($where)
+            ->page($post['page'], $post['limit'])
+            ->field('id,name,phone,shop_address,head_image,shop_name,user_id')
+            ->select();
+        $count = $this->identityModel->where($where)->count();
+        $data = [
+            'rows'  => $list,
+            'total' => $count,
+        ];
+        return msg(200,'获取成功',$data);
+
+    }
 }

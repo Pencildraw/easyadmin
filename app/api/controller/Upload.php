@@ -42,7 +42,7 @@ class Upload extends BaseController
             // 成功上传后获取文件信息  
             $filePath = $info->getFileName();  
             $web_url = Config::get('app')['const_data']['web_url'];
-            $image_url = $web_url .'/uploads/'.$filePath;
+            $image_url = $this->request->domain() .'/uploads/'.$filePath;
             return msg(200,'文件上传成功',['image_url'=>$image_url]);
         } else {  
             // 上传失败  

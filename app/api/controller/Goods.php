@@ -4,6 +4,7 @@ namespace app\api\controller;
  
 use app\common\controller\ApiController;
 use think\App;
+use app\api\model\Identity;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
 use app\BaseController;
@@ -34,6 +35,13 @@ class Goods extends ApiController
         if (empty($goodsData)) {
             return msg(100,'商品错误','');
         }
+        $identityModel = new Identity();
+        $where = [
+            ['goods_id','=',$goodsData['id']],
+            ['type','=',2]
+        ];
+        $identity = $identityModel->where($where)->field('name,head_image')->find();
+        $goodsData['identity'] = $identity;
         return msg(200,'获取成功',$goodsData);
     }    
 }

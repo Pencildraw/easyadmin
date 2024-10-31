@@ -19,6 +19,7 @@ use think\facade\Http;
 use app\api\model\Goods as goodsModel;
 use app\api\model\Order as orderModel;
 use app\api\model\OrderSpec as orderSpecModel;
+use app\api\model\Identity;
 
 class Order extends ApiController
 {
@@ -33,12 +34,51 @@ class Order extends ApiController
 
     // 列表
     public function list(){
-        $orderList = $this->orderModel::with('orderList')->where('user_id',$this->identity['user_id'])->select()->toArray();
-        if (empty($orderList)) {
-            return msg(100,'获取失败',''); 
-        } else {
-            return msg(200,'获取成功',$orderList);
-        } 
+  //      订单列表三种情况,身份为业务员的时候,传type,其他身份不用
+//1. 业务员 订单列表
+//      我的订单
+//      店铺订单
+//      店铺详情-全部订单
+//2. 店铺 订单列表
+//      我的订单
+//3. 用户 订单列表
+//        ----
+        $user = $this->identity;
+        $post = $this->request->post();
+        $rule = [
+            'page|页数'       => 'require',
+            'limit|条数'       => 'require',
+        ];
+        $this->validate($post, $rule,[]);
+        $where = [];
+        if($user['type'] == 3){
+            if(!isset($post['type'])){
+                return msg(100,'参数错误','');
+            }
+            if($post['type']== 1){
+                $where[] = ['user_id','=',$user['user_id']];
+            }elseif($post['type'] == 2){
+                $identityModel = new Identity();
+                $userIds = $identityModel->where("salesman_id",$user['id'])->column('user_id');
+                $where[] = ['user_id','in',$userIds];
+            }elseif($post['type'] == 3){
+                $where[] = ['user_id','=',$post['id']];
+            }
+//            1:我的订单 2全部订单 3店铺订单
+        }else{
+            $where[] = ['user_id','=',$user['user_id']];
+        }
+        $list = $this->orderModel::with('orderList')
+            ->where($where)
+            ->field('id,order_name,order_sn,total_amount,goods_num,gift_num')
+            ->page($post['page'],$post['limit'])
+            ->select();
+        $count = $this->orderModel->where($where)->count();
+        $data = [
+            'rows'  => $list,
+            'total' => $count,
+        ];
+        return msg(200,'获取成功',$data);
     }
 
     // 详情
@@ -48,14 +88,11 @@ class Order extends ApiController
             'order_id|订单参数'       => 'require',
         ];
         $this->validate($post, $rule,[]);
-        $orderList = $this->orderModel::with('orderList')->where('id',$post['order_id'])->where('user_id',$this->identity['user_id'])->find()->toArray();
-        if (empty($orderList)) {
-            return msg(100,'获取失败',''); 
-        } else {
-            return msg(200,'获取成功',$orderList);
-        }
-        
-
+        $orderList = $this->orderModel::with('orderList')
+            ->where('id',$post['order_id'])
+            ->field('id,order_name,order_phone,order_address,total_amount,goods_num,gift_num,order_sn,remark,create_time')
+            ->find();
+        return msg(200,'获取成功',$orderList);
     }
 
     // 计算价格 商品 赠品数量
@@ -145,6 +182,7 @@ class Order extends ApiController
             'goods_num' => $post['num'],
             'salesman_remind' => $goodsData['salesman_remind'],
             'shipping_cost' => $goodsData['shipping_cost'],
+            'images' => $goodsData['images'],
             'create_time' => $create_time,
         ];
         // 赠品规则 10-1 20-3 30-5 40-8 ;50以上 买5赠1
@@ -156,6 +194,7 @@ class Order extends ApiController
             $gift_num = config('app.git_goods')[intval($post['num']/10)*10];
         }
         $orderData['gift_num'] = $gift_num; //赠品数量
+        $specData['gift_num'] = $gift_num; //赠品数量
         //事务
         $this->orderModel->startTrans();
         try {
@@ -187,9 +226,7 @@ class Order extends ApiController
         }
         $this->orderModel->commit();
         return msg(200,'保存成功',['order_id'=>$insertGetId]);
-
-    }   
-
+    }
     // 修改订单
     public function update(){
         $post = $this->request->post();

@@ -30,7 +30,6 @@ if (!is_file(ROOT_PATH . 'config' . DS . 'install' . DS . 'lock' . DS . 'install
 // 设置OPTIONS请求的处理
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     // 如果是预检请求，直接返回
-    echo 123;
     exit();
 }
 // 执行HTTP应用并响应
