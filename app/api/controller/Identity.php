@@ -86,7 +86,8 @@ class Identity extends ApiController
             ->where('i.type',4)
             ->where('i.status',1)
             // ->where('u.status',1)
-            ->field('i.id,i.name,i.phone,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_name,i.shop_address')
+            ->field('i.id,i.name,i.phone,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_name
+                ,i.shop_address,province,city,area')
             ->find();
         if (empty($identity)) {
             return msg(100,'获取失败',''); 
@@ -161,11 +162,15 @@ class Identity extends ApiController
             'shop_phone|店铺手机号'       => 'require',
             'shop_address|店铺地址'       => 'require',
             'head_image|头像'       => 'require',
+            'province|省'       => 'require',
+            'city|市'       => 'require',
+            'area|区'       => 'require',
         ];
         // $message = [
         //     'user_name.max' => ':attribute不能超过5位!',
         // ];
         $this->validate($post, $rule,[]);
+        $post = trimArray($post);
 
         $goodsModel = new \app\api\model\Goods;
         $goods_id = $goodsModel::where('is_default',1)->where('status',1)->value('id');
@@ -190,6 +195,9 @@ class Identity extends ApiController
             'salesman_id' => $this->identity['id'], //业务员ID
             'shop_name' => $post['shop_name'],
             'shop_address' => $post['shop_address'],
+            'province' => $post['province'],
+            'city' => $post['city'],
+            'area' => $post['area'],
         ];
         // print_r($identityData); exit;
         //事务

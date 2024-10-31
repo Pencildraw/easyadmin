@@ -70,9 +70,16 @@ class Order extends ApiController
         }
         $list = $this->orderModel::with('orderList')
             ->where($where)
-            ->field('id,order_name,order_sn,total_amount,goods_num,gift_num')
+            ->field('id,order_name,order_sn,total_amount,goods_num,gift_num
+                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.dealer_id = ea_company_identity.id) AS identity_dealer_name
+                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.shop_id = ea_company_identity.id) AS identity_shop_name
+            ')
             ->page($post['page'],$post['limit'])
             ->select();
+            foreach ($list as $key => &$value) {
+                $value->identity_dealer_name = $value->identity_dealer_name??'';
+                $value->identity_shop_name = $value->identity_shop_name??'';
+            }
         $count = $this->orderModel->where($where)->count();
         $data = [
             'rows'  => $list,
@@ -90,7 +97,8 @@ class Order extends ApiController
         $this->validate($post, $rule,[]);
         $orderList = $this->orderModel::with('orderList')
             ->where('id',$post['order_id'])
-            ->field('id,order_name,order_phone,order_address,total_amount,goods_num,gift_num,order_sn,remark,create_time')
+            ->field('id,order_name,order_phone,order_address,total_amount,goods_num,gift_num,order_sn,remark,create_time
+            ,province,city,area')
             ->find();
         return msg(200,'获取成功',$orderList);
     }
@@ -140,11 +148,19 @@ class Order extends ApiController
             'num|商品数量'       => 'require',
             'price|商品价格'       => 'require',
             'goods_name|商品名称'       => 'require',
+            'identity_id|二维码所属人'       => 'require',
+            'type|二维码所属人类别'       => 'require',
+            'province|省'       => 'require',
+            'city|市'       => 'require',
+            'area|区'       => 'require',
         ];
         // $message = [
         //     'user_name.max' => ':attribute不能超过5位!',
         // ];
         $this->validate($post, $rule,[]);
+        if (!in_array($post['type'],[3,4])) {
+            return msg(100,'二维码所属人类别不符',$post['type']);
+        }
         $create_time = time();
         // 主订单
         $orderData = [
@@ -155,12 +171,15 @@ class Order extends ApiController
             'order_address' => $post['order_name'],
             'total_amount' => $post['total_amount'],
             'order_amount' => $post['total_amount'],
-//            'ok_amount' => $post['ok_amount'],
+            // 'ok_amount' => $post['ok_amount'],
             'supplier_id' => $this->supplier_id, //供应商ID
             // 'dealer_id' => $this->dealer_id, //经销商ID
             'identity_id' => $this->identity['id'], //经销商ID
             'remark' => $post['remark'] ??'',
             'order_sn' => generateNumber(),
+            'province' => $post['province'],
+            'city' => $post['city'],
+            'area' => $post['area'],
             'create_time' => $create_time,
         ];
         // 订单商品
@@ -198,6 +217,24 @@ class Order extends ApiController
         //事务
         $this->orderModel->startTrans();
         try {
+            $supplier_id = 0;
+            $shop_id = 0;
+            // 订单绑定身份
+            if ($post['type'] == 4) {
+                // 店铺
+                $identityModel = new \app\api\model\Identity();
+                $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
+                $shop_id = $identity_shop->id ??0;
+                $supplier_id = $identity_shop->supplier_id ??0;
+            } else if($post['type'] == 3) {
+                // 业务员
+                $identityModel = new \app\api\model\Identity();
+                $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
+                $shop_id = $identity_shop->id ??0;
+                $supplier_id = $identity_shop->supplier_id ??0;
+            }
+            $orderData['supplier_id'] = $supplier_id;
+            $orderData['shop_id'] = $shop_id;
 
             $insertGetId = $this->orderModel->insertGetId($orderData);
             if (!$insertGetId) {

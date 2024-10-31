@@ -11,4 +11,5 @@ public/WowOss.exe
 app/index/controller/Test.php
 composer.phar
 app/test/
+admin/config/app.php
 #vendor

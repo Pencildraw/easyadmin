@@ -98,3 +98,14 @@ function generateNumber($key=0) {
     $random = mt_rand(100000, 999999); // 可以根据需要添加随机数
     return $suffix . $random;
 }
+/**
+ * 去除数组值左右空格
+ * @param $data
+ */
+function trimArray($data = [])
+{
+    foreach ($data as $key => &$value) {
+        $value = trim($value);
+    }
+    return $data;
+}
