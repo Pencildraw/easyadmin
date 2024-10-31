@@ -41,7 +41,10 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     // {field: 'dealer_id', title: '经销商ID'},
                     {field: 'order_name', title: '收货人'},
                     {field: 'order_phone', title: '手机号'},
-                    {field: 'order_address',title: '收货地址'},
+                    // {field: 'order_address',title: '收货地址'},
+                    {field: 'order_address',title: '收货地址' ,templet: function(d){
+                        return d.province+''+d.city+''+d.area+''+d.order_address;
+                    }},
                     {field: 'create_time', minWidth: 80, title: '创建时间', search: 'range'},
                     // {width: 250, title: '操作', templet: ea.table.tool ,operat:['edit']},
 

@@ -15,7 +15,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
         index: function () {
             ea.table.render({
                 init: init,
-                toolbar:['add'],
+                toolbar:[],
                 defaultToolbar:['filter'],
                 cols: [[
                     {type: 'checkbox'},
@@ -29,6 +29,9 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: 'count_order', title: '订单数' ,search:'false'},
                     {field: 'count_goods_num', title: '销售数量' ,search:'false'},
                     {field: 'count_order_price', title: '销售额' ,search:'false'},
+                    {field: 'shop_address',title: '店铺地址' ,templet: function(d){
+                        return d.province+''+d.city+''+d.area+''+d.shop_address;
+                    }},
                     {field: 'create_time', minWidth: 80, title: '创建时间', search: 'range'},
                     {width: 250, title: '操作', templet: ea.table.tool
                         ,operat:['edit']
