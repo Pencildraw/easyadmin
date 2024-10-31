@@ -129,7 +129,7 @@ class Pay extends ApiController
             return msg(200,'下单成功',$payData);
         } else {
             // Log::error('统一下单失败: ' . $res['return_msg']);
-            return msg(100,'下单失败','');
+            return msg(100,'下单失败',$responseData);
         }
     }
     

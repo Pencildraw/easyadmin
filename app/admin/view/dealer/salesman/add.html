@@ -32,6 +32,12 @@
             </div>
         </div> -->
         <div class="layui-form-item">
+            <label class="layui-form-label">所属经销商</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" value="{$identity.name|default=''}" readonly disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">身份类型</label>
             <div class="layui-input-block">
                 <select name="type" disabled="disabled">
@@ -52,12 +58,6 @@
             </div>
         </div>
         <input type="hidden" class="layui-input" name="dealer_id" value="{$identity.id}">
-        <div class="layui-form-item">
-            <label class="layui-form-label">所属经销商</label>
-            <div class="layui-input-block">
-                <input type="text" class="layui-input" value="{$identity.name|default=''}" readonly>
-            </div>
-        </div>
         <div class="hr-line"></div>
         <div class="layui-form-item text-center">
             <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>

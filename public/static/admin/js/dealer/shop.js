@@ -21,7 +21,7 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {type: 'checkbox'},
                     {field: 'idntity_dealer', title: '归属' ,search:'false'},
                     {field: 'identity_supplier', title: '业务员' ,search:'false'},
-                    {field: 'name', title: '业务员(账号)'},
+                    {field: 'name', title: '店铺(账号)'},
                     {field: 'phone', title: '联系方式'},
                     {field: 'status', title: '状态', templet: ea.table.switch},
                     // {field: 'goods_id', title: '代理商品'},
