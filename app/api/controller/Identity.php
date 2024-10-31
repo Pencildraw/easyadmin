@@ -71,6 +71,57 @@ class Identity extends ApiController
         }
     }
 
+    // 店铺详情
+    public function shopInfo(){
+
+        $post = $this->request->post();
+        $rule = [
+            'shop_id|店铺'       => 'require',
+        ];
+        $this->validate($post, $rule,[]);
+        $shop_id = $post['shop_id'];
+        $identity = $this->identityModel->alias('i')
+            // ->leftJoin('company_user u' ,'i.user_id = u.id')
+            ->where('i.id',$shop_id)
+            ->where('i.type',4)
+            ->where('i.status',1)
+            // ->where('u.status',1)
+            ->field('i.id,i.name,i.phone,i.status,i.create_time,i.dealer_id,i.goods_id,i.qrcode_image,i.type,i.address,i.head_image,i.binding_status,i.user_id,i.shop_name,i.shop_address')
+            ->find();
+        if (empty($identity)) {
+            return msg(100,'获取失败',''); 
+        } else {
+            $identityData = $identity->toArray();
+            $typeList = $this->identityModel->typeList();
+            $identityData['type_title'] = $typeList[$identityData['type']] ??'';
+            // 用户订单汇总
+            $orderModel = new \app\api\model\Order();
+            if ($orderModel->where('user_id',$this->identity['user_id'])->count() <1) {
+                $order['sum_order'] = 0; //订单总数
+                $order['sum_amount'] = 0; //订单总销售额
+                $order['monther_order'] = 0; //月订单总数
+                $order['monther_order'] = 0; //月订单总销售额
+            } else {
+                $orderSum = $orderModel->where('shop_id',$shop_id)
+                    ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount')
+                    ->select()->toArray();
+                // 当前月订单 销售额
+                $currentDate = strtotime(date('Y').'-'.date('m').'-'.'01'); //当前月份时间戳
+                $orderMonther = $orderModel->where('shop_id',$shop_id)
+                    ->where([['create_time','>=',$currentDate]])
+                    ->field('count(id) as monther_order ,sum(ok_amount) as monther_amount')
+                    ->select()->toArray();
+                $order['sum_order'] = $orderSum[0]['sum_order']??0;
+                $order['sum_amount'] = $orderSum[0]['sum_amount'] ??0.00;
+                $order['monther_order'] = $orderMonther[0]['monther_order'] ??0;
+                $order['monther_amount'] = $orderMonther[0]['monther_amount'] ??0.00;
+            }
+            $identityData['order'] = $order;
+            
+            return msg(200,'获取成功',$identityData);
+        }
+    }
+
     // 修改
     public function update(){
 

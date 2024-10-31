@@ -126,8 +126,8 @@ class salesman extends AdminController
         $goods = $goodsModel->where('status' ,1)->select();
         $this->assign('goods' ,$goods);
         // $userModel = new user;
-        // $user = $userModel->where('status' ,1)->where('binding_status' ,0)->select();
-        // $this->assign('user' ,$user);
+        $identity = $this->model->where('status' ,1)->where('type' ,2)->find();
+        $this->assign('identity' ,$identity);
         return $this->fetch();
     }
 
@@ -143,8 +143,15 @@ class salesman extends AdminController
             $rule = [];
             $this->validate($post, $rule);
             try {
-                $post['password'] = empty($post['password']) ?'123456':$post['password'];
-                $post['password'] = md5(md5($post['password']));
+                if (!empty($post['password'])) {
+                    // 校验密码
+                    $pattern = "/^[a-zA-Z0-9]+$/";  //密码只包含数字 字母
+                    if (!preg_match($pattern, $post['password'])) {  
+                        $this->error('密码请只输入数字|字母');
+                    } 
+                    $post['password'] = md5(md5($post['password'])); 
+                }
+                $post['update_time'] = time();
                 $save = $row->save($post);
             } catch (\Exception $e) {
                 $this->error('保存失败');
