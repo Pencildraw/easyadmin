@@ -115,7 +115,8 @@ class WebLogin extends BaseController
         $this->validate($post, $rule);
 
         $userModel = new \app\api\model\User;
-        $user = $userModel->where(['openid'=>$post['openid'],'status'=>1])->find();
+        // $user = $userModel->where('openid' ,$post['openid'])->where('status' ,1)->find();
+        $user = $userModel->where('openid' ,$post['openid'])->find();
 
         $data['token'] = '';
         if($user && isset($user->id)){
