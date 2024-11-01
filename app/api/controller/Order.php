@@ -124,7 +124,7 @@ class Order extends ApiController
         // $data['ok_amount'] = $post['num'] * $goodsData->price;
         $data['ok_amount'] = number_format(($post['num'] * $goodsData->price),2,".","");
         // 赠品数量
-        if ($post['num'] <= 10) {
+        if ($post['num'] < 10) {
             $gift_num = 0;
         } else if ($post['num'] >= 50) {
             $gift_num = intval($post['num']/5);
@@ -258,6 +258,9 @@ class Order extends ApiController
             //         throw new \Exception('订单赠品保存失败');
             //     }
             // }
+            $goodsData->sales_volume += $post['num'];
+            $goodsData->update_time = time();
+            $goodsData->save();
 
         } catch (\Exception $e) {
             $this->orderModel->rollback();

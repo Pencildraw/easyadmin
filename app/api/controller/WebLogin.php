@@ -190,13 +190,20 @@ class WebLogin extends BaseController
         //事务
         $userModel->startTrans();
         try {
-            $userData = [
-                'openid' => $result['openid'],
-                'type' => 0,
-            ];
-            if (!$userModel->insert($userData)) {
-                $userModel->rollback();
-                throw new \Exception('用户信息错误');
+            $user = $userModel->where('openid',$result['openid'])->find();
+            if (empty($user)){
+                $userData = [
+                    'openid' => $result['openid'],
+                    'type' => 0,
+                ];
+                if (!$userModel->insert($userData)) {
+                    $userModel->rollback();
+                    throw new \Exception('用户信息错误');
+                }
+            } else {
+                $user->openid = $result['openid'];
+                $user->update_time = time();
+                $user->save();
             }
         } catch (\Exception $e) {
             $userModel->rollback();
