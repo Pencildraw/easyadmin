@@ -112,5 +112,4 @@ on2Xq6AANkJXO7uILvaziRoBu8iU 新
 	province,city,area,
 
 
-	$response = $this->curlPost($url, $xmlData);
-        var_dump($response) ;exit;
+	https://hosj4bb2pabe-2550.shanghai-01.dayunet.com/head_image.jpg

@@ -95,12 +95,15 @@ class Order extends ApiController
             'order_id|订单参数'       => 'require',
         ];
         $this->validate($post, $rule,[]);
-        $orderList = $this->orderModel::with('orderList')
+        $orderData = $this->orderModel::with('orderList')
             ->where('id',$post['order_id'])
             ->field('id,order_name,order_phone,order_address,total_amount,goods_num,gift_num,order_sn,remark,create_time
-            ,province,city,area')
+            ,province,city,area,dealer_id')
             ->find();
-        return msg(200,'获取成功',$orderList);
+        $identityModel = new \app\api\model\Identity;
+        $orderData->identity_dealer = $identityModel->where('id',$orderData->dealer_id)->value('name');
+
+        return msg(200,'获取成功',$orderData);
     }
 
     // 计算价格 商品 赠品数量
@@ -162,6 +165,14 @@ class Order extends ApiController
             return msg(100,'二维码所属人类别不符',$post['type']);
         }
         $create_time = time();
+        // 订单商品
+        $goodsModel = new goodsModel();
+        $goodsData = $goodsModel->where('status',1)->find($post['goods_id']);
+        if (empty($goodsData)) {
+            return msg(100,'商品不存在或已失效',$post); 
+        }
+        $total_fee = number_format(($goodsData->price * $post['num']),2,".",""); 
+        
         // 主订单
         $orderData = [
             'order_status' => 0,
@@ -169,8 +180,8 @@ class Order extends ApiController
             'order_name' => $post['order_name'],
             'order_phone' => $post['order_phone'],
             'order_address' => $post['order_address'],
-            'total_amount' => $post['total_amount'],
-            'order_amount' => $post['total_amount'],
+            'total_amount' => $total_fee,
+            'order_amount' => $total_fee,
             // 'ok_amount' => $post['ok_amount'],
             'supplier_id' => $this->supplier_id, //供应商ID
             // 'dealer_id' => $this->dealer_id, //经销商ID
@@ -182,12 +193,6 @@ class Order extends ApiController
             'area' => $post['area'],
             'create_time' => $create_time,
         ];
-        // 订单商品
-        $goodsModel = new goodsModel();
-        $goodsData = $goodsModel->where('status',1)->find($post['goods_id']);
-        if (empty($goodsData)) {
-            return msg(100,'商品不存在或已失效',$post); 
-        }
         // 商品
         $orderData['goods_num'] = $post['num']; //商品数量
         $specData = [

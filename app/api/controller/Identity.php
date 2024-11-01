@@ -118,6 +118,7 @@ class Identity extends ApiController
                 $order['monther_amount'] = $orderMonther[0]['monther_amount'] ??0.00;
             }
             $identityData['order'] = $order;
+            $identityData['identity_dealer'] = $this->identityModel->where('id',$identityData['dealer_id'])->value('name');
             
             return msg(200,'获取成功',$identityData);
         }
