@@ -108,10 +108,11 @@ class Order extends ApiController
         $orderData = $this->orderModel::with('orderList')
             ->where('id',$post['order_id'])
             ->field('id,order_name,order_phone,order_address,total_amount,goods_num,gift_num,order_sn,remark,create_time
-            ,province,city,area,dealer_id')
+            ,province,city,area,dealer_id,shop_id')
             ->find();
         $identityModel = new \app\api\model\Identity;
         $orderData->identity_dealer = $identityModel->where('id',$orderData->dealer_id)->value('name');
+        $orderData->identity_shop = $identityModel->where('id',$orderData->shop_id)->value('name');
 
         return msg(200,'获取成功',$orderData);
     }
