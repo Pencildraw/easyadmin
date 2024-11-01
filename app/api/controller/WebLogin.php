@@ -163,6 +163,9 @@ class WebLogin extends BaseController
         } else {
             return msg(100,'系统不存在该用户','');
         }
+        if (empty($data['token'])) {
+            return msg(100,'重新获取',$data);
+        }
         return msg(200,'操作成功',$data);
     }
 
