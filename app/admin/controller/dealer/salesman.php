@@ -45,13 +45,15 @@ class salesman extends AdminController
                 ->where($where)
                 ->where('type',3)
                 ->field('ea_company_identity.* 
-                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE salesman_id = ea_company_identity.id) AS count_order 
-                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE salesman_id = ea_company_identity.id) AS count_order_price
-                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE salesman_id = ea_company_identity.id) AS count_goods_num
+                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_order 
+                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_order_price
+                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_goods_num
                 ')
                 ->page($page, $limit)
                 ->order($this->sort)
+                // ->fetchsql(true)
                 ->select();
+                // print_r($list); exit;
             $identityDealer = $this->model->where('type',2)->where('status',1)->find();
             foreach ($list as $key => &$value) {
                 $value->idntity_dealer = $identityDealer->name;
@@ -88,6 +90,7 @@ class salesman extends AdminController
             try {
                 // 添加
                 $post['create_time'] = $create_time;
+                $post['head_image'] = Config::get('app')['const_data']['web_url'].'/head_image.jpg';
                 $insertGetId = $this->model->insertGetId($post);
                 if (!$insertGetId) {
                     $this->model->rollback();

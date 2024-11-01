@@ -205,7 +205,7 @@ class Order extends ApiController
             'create_time' => $create_time,
         ];
         // 赠品规则 10-1 20-3 30-5 40-8 ;50以上 买5赠1
-        if ($post['num'] <= 10) {
+        if ($post['num'] < 10) {
             $gift_num = 0;
         } else if ($post['num'] >= 50) {
             $gift_num = intval($post['num']/5);
@@ -217,7 +217,7 @@ class Order extends ApiController
         //事务
         $this->orderModel->startTrans();
         try {
-            $supplier_id = 0;
+            $salesman_id = 0;
             $shop_id = 0;
             // 订单绑定身份
             if ($post['type'] == 4) {
@@ -226,16 +226,16 @@ class Order extends ApiController
                 $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
                 // $shop_id = $identity_shop->id ??0;
                 $shop_id = $post['identity_id'] ??0;
-                $supplier_id = $identity_shop->supplier_id ??0;
+                $salesman_id = $identity_shop->salesman_id ??0;
             } else if($post['type'] == 3) {
                 // 业务员
                 // $identityModel = new \app\api\model\Identity();
                 // $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
                 // $shop_id = $identity_shop->id ??0;
-                // $supplier_id = $identity_shop->supplier_id ??0;
-                $supplier_id = $post['identity_id'] ??0;
+                // $salesman_id = $identity_shop->salesman_id ??0;
+                $salesman_id = $post['identity_id'] ??0;
             }
-            $orderData['supplier_id'] = $supplier_id;
+            $orderData['salesman_id'] = $salesman_id;
             $orderData['shop_id'] = $shop_id;
 
             $insertGetId = $this->orderModel->insertGetId($orderData);
