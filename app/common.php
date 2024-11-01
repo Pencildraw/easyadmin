@@ -109,3 +109,8 @@ function trimArray($data = [])
     }
     return $data;
 }
+function xmlToJson($xml) {  
+    libxml_use_internal_errors(true);  
+    $data = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);  
+    return $data;  
+}

@@ -21,6 +21,7 @@ return [
     // 不需要验证登录的节点
     'no_login'       => [
         'order/order_notify',
+        'order/refund_notify',
     ],
     'get_request' =>    [
         'kuaishou/kslogin',

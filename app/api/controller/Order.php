@@ -332,17 +332,17 @@ class Order extends ApiController
                 //事务开始
                 $this->orderModel->startTrans();
                 try{
-//                    $orderData = [
-//                        'ok_amount'         =>  $total_fee + $order->ok_amount,
-//                        'pay_status'            =>  1,
-//                        'transaction_id'            =>  $transaction_id,
-//                    ];
+                //   $orderData = [
+                    //   'ok_amount'         =>  $total_fee + $order->ok_amount,
+                    //   'pay_status'            =>  1,
+                    //   'transaction_id'            =>  $transaction_id,
+                //   ];
                     $order->ok_amount = $total_fee;
                     $order->pay_status = 1;
                     $order->transaction_id = $transaction_id;
-//                    $order->update_time = $create_time;
+                //   $order->update_time = $create_time;
                     $order->save();
-//                    $this->orderModel->where('id', $order->id)->update($orderData);
+                //   $this->orderModel->where('id', $order->id)->update($orderData);
                     // $userModel = new \app\api\model\User();
                     $payLogData = [
                         'order_id'        =>  $order->id,
@@ -359,22 +359,99 @@ class Order extends ApiController
                 } catch (\Exception $e) {
                     $this->orderModel->rollback();
                     // 订单修改失败记录日志
-//                    $payLogData = [
-//                        'order_id'        =>  $order->id,
-//                        'user_id'         =>  $order->user_id,
-//                        'identity_id'     =>  $order->identity_id,
-//                        'transaction_id'  =>  $transaction_id,
-//                        'total_fee'       =>  $total_fee,
-//                        'order_sn'        =>  $order_sn,
-//                        'pay_status'      =>  0,
-//                        'create_time'     =>  $create_time,
-//                    ];
-//                    $payLogModel->insert($payLogData);
-//                        exit;
+                //   $payLogData = [
+                    //   'order_id'        =>  $order->id,
+                    //   'user_id'         =>  $order->user_id,
+                    //   'identity_id'     =>  $order->identity_id,
+                    //   'transaction_id'  =>  $transaction_id,
+                    //   'total_fee'       =>  $total_fee,
+                    //   'order_sn'        =>  $order_sn,
+                    //   'pay_status'      =>  0,
+                    //   'create_time'     =>  $create_time,
+                //   ];
+                //   $payLogModel->insert($payLogData);
+                    //   exit;
                     return msg(100,'',$e->getMessage());
                 }
                 $this->orderModel->commit();
             }
         }
+    }
+
+    // 微信退款回调
+    public function refundNotify(){
+        $data = file_get_contents('php://input');
+        $file=fopen("file_refund.txt","w");
+        if($file){
+            fwrite($file,$data);
+            fclose($file);
+        }
+        // $message = (array)simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+        // if ($message['result_code'] == 'SUCCESS' && $message['return_code'] == 'SUCCESS') {
+        //     $str = $message['out_trade_no'];
+        //     $pos = strpos($str, "|");
+
+        //     if ($pos !== false) {
+        //         // 使用 substr 去掉 | 及其之后的部分
+        //         $order_sn = substr($str, 0, $pos);
+        //     } else {
+        //         // 如果没有找到指定的字符串，原样输出
+        //         $order_sn = $str;
+        //     }
+        //     // $openid = $message['openid'];                  // 付款人openID
+        //     $total_fee = ($message['total_fee']) / 100;            // 付款金额
+        //     $transaction_id = $message['transaction_id'];  // 微信支付流水号
+        //     $order = $this->orderModel->where(['order_sn' => $order_sn])->find();
+        //     $payLogModel = new \app\api\model\OrderPayLog(); //支付记录日志
+        //     $create_time = time();
+        //     if($order){
+        //         // $pay_status = 1; //支付类型 {select}  (0:未支付 ,1:已支付)
+        //         //事务开始
+        //         $this->orderModel->startTrans();
+        //         try{
+        //         //   $orderData = [
+        //             //   'ok_amount'         =>  $total_fee + $order->ok_amount,
+        //             //   'pay_status'            =>  1,
+        //             //   'transaction_id'            =>  $transaction_id,
+        //         //   ];
+        //             $order->ok_amount = $total_fee;
+        //             $order->pay_status = 1;
+        //             $order->transaction_id = $transaction_id;
+        //         //   $order->update_time = $create_time;
+        //             $order->save();
+        //         //   $this->orderModel->where('id', $order->id)->update($orderData);
+        //             // $userModel = new \app\api\model\User();
+        //             $payLogData = [
+        //                 'order_id'        =>  $order->id,
+        //                 'user_id'         =>  $order->user_id,
+        //                 'identity_id'     =>  $order->identity_id,
+        //                 'transaction_id'  =>  $transaction_id,
+        //                 'total_fee'       =>  $total_fee,
+        //                 'order_sn'        =>  $order_sn,
+        //                 'pay_status'      =>  1,
+        //                 'create_time'     =>  $create_time,
+        //             ];
+        //             $payLogModel->insert($payLogData);
+        //             // return sprintf("<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+        //         } catch (\Exception $e) {
+        //             $this->orderModel->rollback();
+        //             // 订单修改失败记录日志
+        //         //   $payLogData = [
+        //             //   'order_id'        =>  $order->id,
+        //             //   'user_id'         =>  $order->user_id,
+        //             //   'identity_id'     =>  $order->identity_id,
+        //             //   'transaction_id'  =>  $transaction_id,
+        //             //   'total_fee'       =>  $total_fee,
+        //             //   'order_sn'        =>  $order_sn,
+        //             //   'pay_status'      =>  0,
+        //             //   'create_time'     =>  $create_time,
+        //         //   ];
+        //         //   $payLogModel->insert($payLogData);
+        //             //   exit;
+        //             return msg(100,'',$e->getMessage());
+        //         }
+        //         $this->orderModel->commit();
+        //     }
+        // }
     }
 }

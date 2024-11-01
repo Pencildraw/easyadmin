@@ -57,6 +57,7 @@ return [
         'mch_id' => '1656083885', 
         'secret_key' => 'DHWZUu2Z3zBhsN34Kh2xcqkF4qNWHgR3', //V2、V3秘钥
         'notify_url' => 'https://hosj4bb2pabe-5768.beijing-02.dayunet.com/api/order/orderNotify', //支付回调
+        'refund_notify_url' => 'https://hosj4bb2pabe-5768.beijing-02.dayunet.com/api/order/refundNotify', //退款回调
         'prcode_url' => 'https://hosj4bb2pabe-5768.beijing-02.dayunet.com/api/goods/info', //二维码路径
         'web_url' => 'https://hosj4bb2pabe-5768.beijing-02.dayunet.com', //项目路径
     ],

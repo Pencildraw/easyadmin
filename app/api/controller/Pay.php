@@ -161,5 +161,55 @@ class Pay extends ApiController
         curl_close($ch);
         return $response;
     }
+
+    public function refund(){
+        // 获取请求参数  
+        // $transactionId = 4200002496202410312617916834; // 微信订单号  
+        $transactionId = 4200002496202410312617916834; // 微信订单号  
+        // $out_trade_no = 1730373553883757;    // 商户退款单号  
+        $out_trade_no = 1730365224146664;    // 商户退款单号  
+        $outRefundNo = generateNumber();    // 商户退款单号  
+        $totalFee = 100;           // 原订单金额  
+        $refundFee = 100;         // 退款金额  
+
+        // 配置微信支付  
+        $config = [
+                'app_id'        => Config::get('app')['const_data']['appid'],         // 必填，公众号的唯一标识  
+                'mch_id'        => Config::get('app')['const_data']['mch_id'],         // 必填，商户号  
+                'key'           => Config::get('app')['const_data']['secret_key'],        // 必填，API密钥  
+                // 'cert_client'   => 'path/to/your/apiclient_cert.pem', // 可选，商户证书路径  
+                // 'cert_key'      => 'path/to/your/apiclient_key.pem',  // 可选，商户证书密钥路径  
+                'notify_url'    => Config::get('app')['const_data']['refund_notify_url'], // 可选，异步通知地址  
+                // 其他配置项...  
+                ];
+                // print_r($config); exit;
+        $app = Factory::payment($config);  
+
+        // 发起退款请求  参数分别为：微信订单号、商户退款单号、订单金额、退款金额、其他参数
+        // $result = $app->refund->byTransactionId($transactionId, $outRefundNo, $totalFee, $refundFee, [  
+        //     'refund_desc'   => '退款原因', // 退款原因  
+        // ]);
+        // $result = $app->refund->byOutTradeNumber($out_trade_no, $outRefundNo, $totalFee, $refundFee, [  
+        //     'refund_desc'   => '退款原因', // 退款原因  
+        // ]);
+        // print_r($result); exit;
+        // // 返回结果  
+        // if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {  
+        //     // return Json::create(['status' => 'success', 'message' => 'Refund success', 'data' => $result]);  
+        // } else {  
+        //     // return Json::create(['status' => 'fail', 'message' => 'Refund failed', 'data' => $result]);  
+        // }  
+        try {  
+            $result = $app->refund->byTransactionId($transactionId, $outRefundNo, $totalFee, $refundFee, [  
+                'refund_desc'   => 'Refund description',  
+            ]);  
+            // $result = $app->refund->byOutTradeNumber($out_trade_no, $outRefundNo, $totalFee, $refundFee, [  
+            //         'refund_desc'   => '退款原因', // 退款原因  
+            //     ]);
+            print_r($result); exit;
+        } catch (\Exception $e) {  
+            echo 'Error: ',  $e->getMessage(), "\n";  
+        }
+    }
     
 }

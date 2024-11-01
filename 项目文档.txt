@@ -107,3 +107,7 @@ oyVdK6s4NhAGXxaaIUq3ogd-VGCI 旧
 on2Xq6AANkJXO7uILvaziRoBu8iU 新
 
 	province,city,area,
+
+
+	$response = $this->curlPost($url, $xmlData);
+        var_dump($response) ;exit;
