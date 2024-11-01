@@ -117,17 +117,17 @@ class WebLogin extends BaseController
         $userModel = new \app\api\model\User;
         // $user = $userModel->where('openid' ,$post['openid'])->where('status' ,1)->find();
         $user = $userModel->where('openid' ,$post['openid'])->find();
-
+        // return msg(200,'操作成功',$user);
         $data['token'] = '';
         if($user && isset($user->id)){
             $identityModel = new \app\api\model\Identity;
             // print_r($row); exit;
             if ($identityModel->where('user_id',$user->id)->where('status',1)->count()<1 && $type==2) {
                 // 普通用户进来 创建用户身份 type = 5
-                // if ($identityModel->where('user_id',$user->id)->where('status',1)->count() <1) {
+                if ($identityModel->where('user_id',$user->id)->where('status',1)->count() <1) {
                     // return msg(100,'不存在账号或已禁用: '.$user['name'],'');
                     // 普通用户token
-                    //事务
+                    // 事务
                     $identityModel->startTrans();
                     try {
                         $identityData = [
@@ -152,23 +152,22 @@ class WebLogin extends BaseController
                         return msg(100,'用户身份信息保存失败','');
                     }
                     $identityModel->commit();
-                // }
-            } else {
-                
-                $row = $identityModel->where('user_id',$user['id'])->find();
-                if (empty($row)) {
-                    return msg(100,'系统不存在该账号','');
                 }
-                $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
-                $data['type'] = $row['type'];
-                $data['type_title'] = $identityModel->typeList()[$row['type']];
             }
+                
+            $row = $identityModel->where('user_id',$user['id'])->find();
+            if (empty($row)) {
+                return msg(100,'系统不存在该账号','');
+            }
+            $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+            $data['type'] = $row['type'];
+            $data['type_title'] = $identityModel->typeList()[$row['type']];
         } else {
             return msg(100,'系统不存在该用户','');
         }
-        if (empty($data['token'])) {
-            return msg(100,'重新获取',$data);
-        }
+        // if (empty($data['token'])) {
+        //     return msg(100,'重新获取',$data);
+        // }
         return msg(200,'操作成功',$data);
     }
 
