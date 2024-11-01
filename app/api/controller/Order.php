@@ -43,30 +43,40 @@ class Order extends ApiController
 //      我的订单
 //3. 用户 订单列表
 //        ----
-        $user = $this->identity;
+        $identity = $this->identity;
         $post = $this->request->post();
         $rule = [
             'page|页数'       => 'require',
             'limit|条数'       => 'require',
         ];
         $this->validate($post, $rule,[]);
-        $where = [];
-        if($user['type'] == 3){
-            if(!isset($post['type'])){
-                return msg(100,'参数错误','');
-            }
+        $where = [
+            ['pay_status','=',1]
+        ];
+        //3业务员 salesman_id 4 店铺 shop_id 5用户 user_id
+//        var_dump($user);exit;
+//        if($identity['type'] == 3){
+//            $field = ['salesman_id','=',$identity['id']];
+//        }elseif($identity['type'] == 4){
+//            $field = ['shop_id','=',$identity['id']];
+//        }else{
+//            $field = ['user_id','=',$identity['user_id']];
+//        }
+        if($identity['type'] == 3 && isset($post['type'])){
             if($post['type']== 1){
-                $where[] = ['user_id','=',$user['user_id']];
+                $where[] = ['salesman_id','=',$identity['id']];
+                $where[] = ['shop_id','=',0];
             }elseif($post['type'] == 2){
-                $identityModel = new Identity();
-                $userIds = $identityModel->where("salesman_id",$user['id'])->column('user_id');
-                $where[] = ['user_id','in',$userIds];
+                $where[] = ['salesman_id','=',$identity['id']];
+                $where[] = ['shop_id','<>',0];
             }elseif($post['type'] == 3){
-                $where[] = ['user_id','=',$post['id']];
+                $where[] = ['shop_id','=',$post['id']];
+            }else{
+                $where[] = ['user_id','=',$identity['user_id']];
             }
 //            1:我的订单 2全部订单 3店铺订单
         }else{
-            $where[] = ['user_id','=',$user['user_id']];
+            $where[] = ['user_id','=',$identity['user_id']];
         }
         $list = $this->orderModel::with('orderList')
             ->where($where)

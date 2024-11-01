@@ -49,15 +49,17 @@ class Identity extends ApiController
                 $order['sum_order'] = 0; //订单总数
                 $order['sum_amount'] = 0; //订单总销售额
                 $order['monther_order'] = 0; //月订单总数
-                $order['monther_order'] = 0; //月订单总销售额
+                $order['monther_amount'] = 0; //月订单总销售额
             } else {
                 $orderSum = $orderModel->where('user_id',$this->identity['user_id'])
                     ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount')
+                    ->where('pay_status',1)
                     ->select()->toArray();
                 // 当前月订单 销售额
                 $currentDate = strtotime(date('Y').'-'.date('m').'-'.'01'); //当前月份时间戳
                 $orderMonther = $orderModel->where('user_id',$this->identity['user_id'])
                     ->where([['create_time','>=',$currentDate]])
+                    ->where('pay_status',1)
                     ->field('count(id) as monther_order ,sum(ok_amount) as monther_amount')
                     ->select()->toArray();
                 $order['sum_order'] = $orderSum[0]['sum_order']??0;
