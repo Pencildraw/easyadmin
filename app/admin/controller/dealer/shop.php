@@ -44,10 +44,10 @@ class shop extends AdminController
                 ->where($where)
                 ->where('type',4)
                 ->field('ea_company_identity.* 
-                    ,(SELECT name FROM ea_company_identity WHERE id = ea_company_identity.supplier_id) AS identity_supplier 
-                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_order 
-                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_order_price
-                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id) AS count_goods_num
+                    ,(SELECT name FROM ea_company_identity WHERE id = ea_company_identity.supplier_id AND ea_mall_order.pay_status=1) AS identity_supplier 
+                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order 
+                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
+                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
                 ')
                 ->page($page, $limit)
                 ->order($this->sort)

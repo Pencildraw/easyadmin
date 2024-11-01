@@ -195,7 +195,7 @@ class Identity extends ApiController
             'type' => 4, //店铺
             'head_image' => $post['head_image'],
             // 'binding_status' => 0,
-            'password' => $post['password'],
+            'password' => md5(md5($post['password'])),
             // 'user_id' => $this->identity['user_id'],
             'salesman_id' => $this->identity['id'], //业务员ID
             'shop_name' => $post['shop_name'],

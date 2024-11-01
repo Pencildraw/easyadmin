@@ -45,9 +45,9 @@ class salesman extends AdminController
                 ->where($where)
                 ->where('type',3)
                 ->field('ea_company_identity.* 
-                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_order 
-                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_order_price
-                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id) AS count_goods_num
+                    ,(SELECT COUNT(*) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order 
+                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
+                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
                 ')
                 ->page($page, $limit)
                 ->order($this->sort)

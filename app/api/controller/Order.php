@@ -81,8 +81,8 @@ class Order extends ApiController
         $list = $this->orderModel::with('orderList')
             ->where($where)
             ->field('id,order_name,order_sn,total_amount,goods_num,gift_num
-                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.dealer_id = ea_company_identity.id) AS identity_dealer_name
-                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.shop_id = ea_company_identity.id) AS identity_shop_name
+                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.dealer_id=ea_company_identity.id AND ea_mall_order.pay_status=1) AS identity_dealer_name
+                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.shop_id=ea_company_identity.id  AND ea_mall_order.pay_status=1) AS identity_shop_name
             ')
             ->page($post['page'],$post['limit'])
             ->select();
@@ -111,8 +111,15 @@ class Order extends ApiController
             ,province,city,area,dealer_id,shop_id')
             ->find();
         $identityModel = new \app\api\model\Identity;
-        $orderData->identity_dealer = $identityModel->where('id',$orderData->dealer_id)->value('name');
-        $orderData->identity_shop = $identityModel->where('id',$orderData->shop_id)->value('name');
+        // $orderData->identity_dealer = $identityModel->where('id',$orderData->dealer_id)->value('name');
+        // $orderData->identity_shop = $identityModel->where('id',$orderData->shop_id)->value('name');
+        if ($orderData->shop_id) {
+            $identityData = $identityModel->where('id',$orderData->dealer_id)->field('name identity_dealer,head_image')->find();
+        } else {
+            $identityData = $identityModel->where('id',$orderData->shop_id)->field('name identity_dealer,head_image')->find();
+        }
+        $orderData->identity_dealer = $identityData->identity_dealer ??'';
+        $orderData->head_image = $identityData->head_image ??'';
         $goodsModel = new \app\api\model\Goods();
         $orderData->goods_image = $goodsModel->where('is_default',1)->value('images');
 
