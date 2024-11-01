@@ -211,5 +211,83 @@ class Pay extends ApiController
             echo 'Error: ',  $e->getMessage(), "\n";  
         }
     }
+
+    // 原生测退款
+    public function test_refund(){
+        // 获取请求参数  
+        // $transactionId = 4200002496202410312617916834; // 微信订单号  
+        $transactionId = 4200002496202410312617916834; // 微信订单号  
+        // $out_trade_no = 1730373553883757;    // 商户退款单号  
+        $out_trade_no = 1730365224146664;    // 商户退款单号  
+        $outRefundNo = generateNumber();    // 商户退款单号  
+        $totalFee = 100;           // 原订单金额  
+        $refundFee = 100;         // 退款金额  
+
+        // 配置微信支付  
+        $config = [
+                'app_id'        => Config::get('app')['const_data']['appid'],         // 必填，公众号的唯一标识  
+                'mch_id'        => Config::get('app')['const_data']['mch_id'],         // 必填，商户号  
+                'key'           => Config::get('app')['const_data']['secret_key'],        // 必填，API密钥  
+                // 'cert_client'   => 'path/to/your/apiclient_cert.pem', // 可选，商户证书路径  
+                // 'cert_key'      => 'path/to/your/apiclient_key.pem',  // 可选，商户证书密钥路径  
+                'notify_url'    => Config::get('app')['const_data']['refund_notify_url'], // 可选，异步通知地址  
+                // 其他配置项...  
+                ];
+                // print_r($config); exit;
+        
+        // 退款参数  
+        $refundParams = [  
+            'appid' => $config['app_id'],  
+            'mch_id' => $config['mch_id'],  
+            'nonce_str' => generateNumber(), // 生成随机字符串的函数  
+            'out_refund_no' => $transactionId, // 退款单号，需要唯一  
+            'out_trade_no' => $out_trade_no, // 原订单号  
+            'total_fee' => $totalFee, // 原订单金额，单位为分  
+            'refund_fee' => $refundFee, // 退款金额，单位为分  
+            'openid' => 'on2Xq6AANkJXO7uILvaziRoBu8iU', // 用户openid  
+            // 其他参数...  
+        ];  
+        
+        // 生成签名  
+        $refundParams['sign'] = $this->generateSign($refundParams, $config['key']);  
+        
+        // 将退款参数转换为XML格式  
+        $xml = $this->arrayToXml($refundParams);  
+        
+        // 发送退款请求到微信支付API  
+        $response = $this->curlPost('https://api.mch.weixin.qq.com/pay/refund', $xml);  
+        var_dump($response); exit;
+        // 解析微信支付的退款响应  
+        $result = $this->xmlToArray($response);  
+        var_dump($result); exit;
+        // 检查退款结果并处理  
+        if ($result['return_code'] == 'SUCCESS' && $result['result_code'] == 'SUCCESS') {  
+            // 退款成功，更新订单状态等  
+        } else {  
+            // 退款失败，处理错误  
+        }  
+        
+        
+    }
+    // 辅助函数（需要根据实际情况实现）  
+    public function createNonceStr($length = 32) {  
+        // 生成随机字符串  
+    }  
+    
+    // public function generateSign($params, $key) {  
+    //     // 生成签名  
+    // }  
+    
+    // public function arrayToXml($arr) {  
+    //     // 将数组转换为XML格式  
+    // }  
+    
+    public function sendRequestToWxApi($url, $xml) {  
+        // 使用cURL发送HTTP POST请求到微信支付API  
+    }  
+    
+    public function xmlToArray($xml) {  
+        // 将XML格式的数据转换为数组  
+    }
     
 }

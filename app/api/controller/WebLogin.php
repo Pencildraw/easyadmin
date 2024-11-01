@@ -111,6 +111,7 @@ class WebLogin extends BaseController
         $rule = [
             'openid|必要条件'       => 'require',
         ];
+        $type = $post['type'] ??1; //1:业务员,店铺(链接进来的) ,2:普通用户(扫码进来的)
         $this->validate($post, $rule);
 
         $userModel = new \app\api\model\User;
@@ -119,37 +120,46 @@ class WebLogin extends BaseController
         $data['token'] = '';
         if($user && isset($user->id)){
             $identityModel = new \app\api\model\Identity;
-            if ($identityModel->where('user_id',$user->id)->where('status',1)->count() <1) {
-                // return msg(100,'不存在账号或已禁用: '.$user['name'],'');
-                // 普通用户token
-                //事务
-                $identityModel->startTrans();
-                try {
-                    $identityData = [
-                        'create_time' => time(),
-                        'type' => 5,
-                        'binding_status' => 1,
-                        'user_id' => $user->id,
-                    ];
-                    $insertGetId = $identityModel->insertGetId($identityData);
-                    // 关联用户信息
-                    $user->identity_id = $insertGetId;
-                    $user->binding_status = 1;
-                    if (!$insertGetId || !$user->save()) {
-                        $identityModel->rollback();
-                        throw new \Exception('保存失败');
-                    }
+            // print_r($row); exit;
+            if ($identityModel->where('user_id',$user->id)->where('status',1)->count()<1 && $type==2) {
+                // 普通用户进来 创建用户身份 type = 5
+                // if ($identityModel->where('user_id',$user->id)->where('status',1)->count() <1) {
+                    // return msg(100,'不存在账号或已禁用: '.$user['name'],'');
+                    // 普通用户token
+                    //事务
+                    $identityModel->startTrans();
+                    try {
+                        $identityData = [
+                            'create_time' => time(),
+                            'type' => 5,
+                            'binding_status' => 1,
+                            'user_id' => $user->id,
+                        ];
+                        $insertGetId = $identityModel->insertGetId($identityData);
+                        // 关联用户信息
+                        $user->identity_id = $insertGetId;
+                        $user->binding_status = 1;
+                        if (!$insertGetId || !$user->save()) {
+                            $identityModel->rollback();
+                            throw new \Exception('保存失败');
+                        }
 
-                } catch (\Exception $e) {
-                    $identityModel->rollback();
-                    return msg(100,'用户身份信息保存失败','');
+                    } catch (\Exception $e) {
+                        $identityModel->rollback();
+                        return msg(100,'用户身份信息保存失败','');
+                    }
+                    $identityModel->commit();
+                // }
+            } else {
+                
+                $row = $identityModel->where('user_id',$user['id'])->find();
+                if (empty($row)) {
+                    return msg(100,'系统不存在该账号','');
                 }
-                $identityModel->commit();
+                $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
+                $data['type'] = $row['type'];
+                $data['type_title'] = $identityModel->typeList()[$row['type']];
             }
-            $row = $identityModel->where('user_id',$user['id'])->find();
-            $data['token'] = JWT::encode(array('id'=>$row['id'],'user_id'=>$row['user_id'],'phone'=>$row['phone'],'type'=>$row['type']), config('app.jwt.key'), 'HS256');
-            $data['type'] = $row['type'];
-            $data['type_title'] = $identityModel->typeList()[$row['type']];
         } else {
             return msg(100,'系统不存在该用户','');
         }
