@@ -224,14 +224,16 @@ class Order extends ApiController
                 // 店铺
                 $identityModel = new \app\api\model\Identity();
                 $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
-                $shop_id = $identity_shop->id ??0;
+                // $shop_id = $identity_shop->id ??0;
+                $shop_id = $post['identity_id'] ??0;
                 $supplier_id = $identity_shop->supplier_id ??0;
             } else if($post['type'] == 3) {
                 // 业务员
-                $identityModel = new \app\api\model\Identity();
-                $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
-                $shop_id = $identity_shop->id ??0;
-                $supplier_id = $identity_shop->supplier_id ??0;
+                // $identityModel = new \app\api\model\Identity();
+                // $identity_shop = $identityModel::where('id',$post['identity_id'])->find();
+                // $shop_id = $identity_shop->id ??0;
+                // $supplier_id = $identity_shop->supplier_id ??0;
+                $supplier_id = $post['identity_id'] ??0;
             }
             $orderData['supplier_id'] = $supplier_id;
             $orderData['shop_id'] = $shop_id;

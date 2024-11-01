@@ -198,6 +198,7 @@ class Identity extends ApiController
             'province' => $post['province'],
             'city' => $post['city'],
             'area' => $post['area'],
+            'create_time' => time(),
         ];
         // print_r($identityData); exit;
         //事务
