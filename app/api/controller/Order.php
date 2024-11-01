@@ -167,8 +167,8 @@ class Order extends ApiController
             'order_status' => 0,
             'user_id' => $this->identity['user_id'], //用户ID
             'order_name' => $post['order_name'],
-            'order_phone' => $post['order_name'],
-            'order_address' => $post['order_name'],
+            'order_phone' => $post['order_phone'],
+            'order_address' => $post['order_address'],
             'total_amount' => $post['total_amount'],
             'order_amount' => $post['total_amount'],
             // 'ok_amount' => $post['ok_amount'],
