@@ -113,6 +113,8 @@ class Order extends ApiController
         $identityModel = new \app\api\model\Identity;
         $orderData->identity_dealer = $identityModel->where('id',$orderData->dealer_id)->value('name');
         $orderData->identity_shop = $identityModel->where('id',$orderData->shop_id)->value('name');
+        $goodsModel = new \app\api\model\Goods();
+        $orderData->goods_image = $goodsModel->where('is_default',1)->value('images');
 
         return msg(200,'获取成功',$orderData);
     }

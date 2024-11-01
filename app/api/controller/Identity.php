@@ -162,6 +162,7 @@ class Identity extends ApiController
         $rule = [
             'name|名称(账号)'       => 'require',
             'shop_name|店铺名称'       => 'require',
+            'password|密码'       => 'require',
             'shop_phone|店铺手机号'       => 'require',
             'shop_address|店铺地址'       => 'require',
             'head_image|头像'       => 'require',
@@ -181,6 +182,7 @@ class Identity extends ApiController
             return msg(100,'关联商品已下架,无法添加店铺',$post);
         }
         $type = 4; //店铺类别
+        $post['password'] = empty($post['password']) ?'123456':$post['password'];
         // 店铺信息
         $identityData = [
             'name' => $post['name'],
@@ -193,7 +195,7 @@ class Identity extends ApiController
             'type' => 4, //店铺
             'head_image' => $post['head_image'],
             // 'binding_status' => 0,
-            'password' => md5(md5(123456)),
+            'password' => $post['password'],
             // 'user_id' => $this->identity['user_id'],
             'salesman_id' => $this->identity['id'], //业务员ID
             'shop_name' => $post['shop_name'],
