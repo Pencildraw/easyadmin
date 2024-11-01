@@ -124,7 +124,7 @@ class Order extends ApiController
         // $data['ok_amount'] = $post['num'] * $goodsData->price;
         $data['ok_amount'] = number_format(($post['num'] * $goodsData->price),2,".","");
         // 赠品数量
-        if ($post['num'] <= 10) {
+        if ($post['num'] < 10) {
             $gift_num = 0;
         } else if ($post['num'] >= 50) {
             $gift_num = intval($post['num']/5);
@@ -237,7 +237,6 @@ class Order extends ApiController
             }
             $orderData['supplier_id'] = $supplier_id;
             $orderData['shop_id'] = $shop_id;
-            $orderData['identity_type'] = $post['type'];
 
             $insertGetId = $this->orderModel->insertGetId($orderData);
             if (!$insertGetId) {
@@ -259,8 +258,8 @@ class Order extends ApiController
             //         throw new \Exception('订单赠品保存失败');
             //     }
             // }
-            // 增加商品销量
             $goodsData->sales_volume += $post['num'];
+            $goodsData->update_time = time();
             $goodsData->save();
 
         } catch (\Exception $e) {

@@ -22,6 +22,7 @@ return [
     'no_login'       => [
         'order/order_notify',
         'order/refund_notify',
+        'goods/info',
     ],
     'get_request' =>    [
         'kuaishou/kslogin',
