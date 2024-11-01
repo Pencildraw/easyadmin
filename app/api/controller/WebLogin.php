@@ -139,6 +139,8 @@ class WebLogin extends BaseController
                         // 关联用户信息
                         $user->identity_id = $insertGetId;
                         $user->binding_status = 1;
+                        $user->type = 5;
+                        $user->update_time = time();
                         if (!$insertGetId || !$user->save()) {
                             $identityModel->rollback();
                             throw new \Exception('保存失败');
