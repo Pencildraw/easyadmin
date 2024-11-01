@@ -237,6 +237,7 @@ class Order extends ApiController
             }
             $orderData['supplier_id'] = $supplier_id;
             $orderData['shop_id'] = $shop_id;
+            $orderData['identity_type'] = $post['type'];
 
             $insertGetId = $this->orderModel->insertGetId($orderData);
             if (!$insertGetId) {
@@ -258,6 +259,9 @@ class Order extends ApiController
             //         throw new \Exception('订单赠品保存失败');
             //     }
             // }
+            // 增加商品销量
+            $goodsData->sales_volume += $post['num'];
+            $goodsData->save();
 
         } catch (\Exception $e) {
             $this->orderModel->rollback();
