@@ -75,6 +75,8 @@ class Order extends ApiController
                 $where[] = ['user_id','=',$identity['user_id']];
             }
 //            1:我的订单 2全部订单 3店铺订单
+        }elseif($identity['type'] == 4){
+            $where[] = ['shop_id','=',$identity['id']];
         }else{
             $where[] = ['user_id','=',$identity['user_id']];
         }
