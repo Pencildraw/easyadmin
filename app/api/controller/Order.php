@@ -83,7 +83,7 @@ class Order extends ApiController
         $list = $this->orderModel::with('orderList')
             ->where($where)
             ->field('id,order_name,order_sn,total_amount,goods_num,gift_num
-                ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.shop_id=ea_company_identity.id  AND ea_mall_order.pay_status=1) AS identity_shop_name
+                ,(SELECT shop_name FROM ea_company_identity WHERE ea_mall_order.shop_id=ea_company_identity.id  AND ea_mall_order.pay_status=1) AS identity_shop_name
                 ,(SELECT head_image FROM ea_company_identity WHERE ea_mall_order.shop_id=ea_company_identity.id  AND ea_mall_order.pay_status=1) AS identity_head_image
             ')
             // ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.dealer_id=ea_company_identity.id AND ea_mall_order.pay_status=1) AS identity_dealer_name
@@ -123,7 +123,7 @@ class Order extends ApiController
         if (!$orderData->shop_id) {
             $identityData = $identityModel->where('id',$orderData->dealer_id)->field('name identity_dealer,head_image')->find();
         } else {
-            $identityData = $identityModel->where('id',$orderData->shop_id)->field('name identity_dealer,head_image')->find();
+            $identityData = $identityModel->where('id',$orderData->shop_id)->field('shop_name identity_dealer,head_image')->find();
         }
         $orderData->identity_dealer = $identityData->identity_dealer ??'';
         $orderData->head_image = $identityData->head_image ??'';
