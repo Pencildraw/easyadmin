@@ -17,8 +17,8 @@ class Upload extends BaseController
             return msg(100,'请上传文件','');
         }  
   
-        // 定义允许的文件格式  
-        $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];  
+        // 定义允许的文件格式  jpeg jpg png gif bmp TIFF|tiff PSD|psd ico icon
+        $allowedMimeTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/bmp','image/tiff','image/psd','image/ico','image/icon'];  
         // 获取文件的 MIME 类型  
         $mimeType = $file->getMime();  
         // 检查 MIME 类型是否在允许的列表中  
@@ -26,8 +26,8 @@ class Upload extends BaseController
             return msg(100,'请上传有效文件: '.'jpeg|jpg|png|gif','');
         }  
 
-        // 定义最大文件大小（例如：2MB）  
-        $maxSize = 1 * 1024 * 1024; // 1MB in bytes  
+        // 定义最大文件大小（例如：2MB）  10MB限制
+        $maxSize = 10 * 1024 * 1024; // 1MB in bytes  
         // 获取文件大小  
         $fileSize = $file->getSize();  
         // 检查文件大小是否超过限制  
