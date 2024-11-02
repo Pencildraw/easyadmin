@@ -44,7 +44,8 @@ class shop extends AdminController
                 ->where($where)
                 ->where('type',4)
                 ->field('ea_company_identity.* 
-                    ,(SELECT name FROM ea_company_identity WHERE id = ea_company_identity.supplier_id) AS identity_supplier 
+                    ,(SELECT name FROM ea_company_identity WHERE dealer_id = ea_company_identity.id) AS identity_dealer 
+                    ,(SELECT NAME FROM ea_company_identity as sales WHERE ea_company_identity.salesman_id = sales.id ) AS identity_salesman
                     ,(SELECT COUNT(id) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order 
                     ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
                     ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
@@ -53,11 +54,13 @@ class shop extends AdminController
                 ->order($this->sort)
                 // ->fetchsql(true)
                 ->select();
+                // ->toarray();
             // print_r($list); exit;
-            $identityDealer = $this->model->where('type',2)->where('status',1)->find();
-            foreach ($list as $key => &$value) {
-                $value->idntity_dealer = $identityDealer->name;
-            }
+            // $identityDealer = $this->model->where('type',2)->where('status',1)->find();
+            // foreach ($list as $key => &$value) {
+            //     $value->idntity_dealer = $identityDealer->idntity_dealer;
+            //     $value->idntity_salesman = $identityDealer->idntity_salesman;
+            // }
             $data = [
                 'code'  => 0,
                 'msg'   => '',

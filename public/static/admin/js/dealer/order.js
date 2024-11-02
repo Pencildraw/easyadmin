@@ -21,14 +21,14 @@ define(["jquery", "easy-admin"], function ($, ea) {
                     {field: 'order_sn', title: '订单编号' ,width:200},
                     {field: 'identity_shop', title: '门店' ,search:'false',templet: function(d){
                         if (d.identity_shop == null) {
-                            return '';
+                            return '-';
                         } else {
                             return d.identity_shop+' '+d.shop_phone;
                         }
                     }},
                     {field: 'identity_supplier', title: '业务员' ,search:'false',templet: function(d){
                         if (d.identity_supplier == null) {
-                            return '';
+                            return '-';
                         } else {
                             return d.identity_supplier+' '+d.supplier_phone;
                         }

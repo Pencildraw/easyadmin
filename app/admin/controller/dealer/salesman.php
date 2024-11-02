@@ -9,6 +9,7 @@ use think\App;
 
 use app\admin\model\mall\goods;
 use app\admin\model\company\user;
+use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
 use think\facade\Config;
 
 /**
@@ -41,7 +42,10 @@ class salesman extends AdminController
                 ->where($where)
                 ->where('type',3)
                 ->count();
-            $list = $this->model
+            if ($count <1) {
+                $list = '';
+            } else {
+                $list = $this->model
                 ->where($where)
                 ->where('type',3)
                 ->field('ea_company_identity.* 
@@ -52,11 +56,13 @@ class salesman extends AdminController
                 ->page($page, $limit)
                 ->order($this->sort)
                 // ->fetchsql(true)
-                ->select();
+                // ->select();
+                ->select()->toArray();
                 // print_r($list); exit;
-            $identityDealer = $this->model->where('type',2)->where('status',1)->find();
-            foreach ($list as $key => &$value) {
-                $value->idntity_dealer = $identityDealer->name;
+                $identityDealer = $this->model->where('type',2)->where('status',1)->find();
+                foreach ($list as $key => &$value) {
+                    $value['idntity_dealer'] = $identityDealer->name;
+                }
             }
             $data = [
                 'code'  => 0,
@@ -77,10 +83,11 @@ class salesman extends AdminController
     {
         if ($this->request->isPost()) {
             $post = $this->request->post();
+            $post = trimArray($post);
             $rule = [];
             $this->validate($post, $rule);
 
-            if ($this->model->where('name',$post['name'])->count() >1) {
+            if ($this->model->where('name',$post['name'])->count() >=1) {
                 $this->error('已存在该名称,请重新输入!');
             }
             $post['password'] = empty($post['password']) ?'123456':$post['password'];

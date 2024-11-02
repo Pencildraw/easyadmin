@@ -2,9 +2,15 @@
     <form id="app-form" class="layui-form layuimini-form">
         
         <div class="layui-form-item">
-            <label class="layui-form-label">名称</label>
+            <label class="layui-form-label">店铺(账号)</label>
             <div class="layui-input-block" disabled="disabled">
                 <input type="text" name="name" class="layui-input"  placeholder="请输入名称" value="{$row.name|default=''}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">店铺名称</label>
+            <div class="layui-input-block" disabled="disabled">
+                <input type="text" name="shop_name" class="layui-input"  placeholder="请输入名称" value="{$row.shop_name|default=''}">
             </div>
         </div>
         <div class="layui-form-item">
@@ -13,12 +19,12 @@
                 <input type="text" name="phone" class="layui-input"  placeholder="请输入联系方式" value="{$row.phone|default=''}">
             </div>
         </div>
-        <div class="layui-form-item">
+        <!-- <div class="layui-form-item">
             <label class="layui-form-label">账号密码</label>
             <div class="layui-input-block">
                 <input type="text" name="password" class="layui-input"  placeholder="可不填写 ,默认原密码" value="">
             </div>
-        </div>
+        </div> -->
         <div class="hr-line"></div>
         <div class="layui-form-item text-center">
             <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit>确认</button>
