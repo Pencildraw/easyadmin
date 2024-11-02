@@ -47,8 +47,8 @@ class shop extends AdminController
                     ,(SELECT name FROM ea_company_identity WHERE dealer_id = ea_company_identity.id) AS identity_dealer 
                     ,(SELECT NAME FROM ea_company_identity as sales WHERE ea_company_identity.salesman_id = sales.id ) AS identity_salesman
                     ,(SELECT COUNT(id) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order 
-                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
-                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
+                    ,(SELECT SUM(ok_amount) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
+                    ,(SELECT SUM(goods_num) FROM ea_mall_order WHERE shop_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
                 ')
                 ->page($page, $limit)
                 ->order($this->sort)

@@ -34,18 +34,19 @@ define(["jquery", "easy-admin"], function ($, ea) {
                         }
                     }},
                     // {field: 'user_id', title: '用户ID'},
-                    {field: 'total_amount', title: '总金额' ,search:'false', templet: ea.table.price},
-                    {field: 'goods_num', title: '商品数量' ,search:'false'},
-                    {field: 'gift_num', title: '赠品数量' ,search:'false'},
+                    {field: 'total_amount', title: '总金额', Width: 40 ,search:'false', templet: ea.table.price},
+                    {field: 'goods_num', title: '商品数量', Width: 40 ,search:'false'},
+                    {field: 'gift_num', title: '赠品数量', Width: 40 ,search:'false'},
                     // {field: 'supplier_id', title: '供应商ID'},
                     // {field: 'dealer_id', title: '经销商ID'},
                     {field: 'order_name', title: '收货人'},
                     {field: 'order_phone', title: '手机号'},
                     // {field: 'order_address',title: '收货地址'},
-                    {field: 'order_address',title: '收货地址' ,templet: function(d){
+                    {field: 'order_address',title: '收货地址',search:'false' ,templet: function(d){
                         return d.province+''+d.city+''+d.area+''+d.order_address;
                     }},
-                    {field: 'create_time', minWidth: 80, title: '创建时间', search: 'range'},
+                    {field: 'create_time', minWidth: 100, title: '创建时间', search: 'range'},
+                    {field: 'remark', Width: 100, title: '备注', search: 'false'},
                     // {width: 250, title: '操作', templet: ea.table.tool ,operat:['edit']},
 
                 ]],

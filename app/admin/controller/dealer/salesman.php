@@ -50,8 +50,8 @@ class salesman extends AdminController
                 ->where('type',3)
                 ->field('ea_company_identity.* 
                     ,(SELECT COUNT(*) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order 
-                    ,(SELECT COUNT(ok_amount) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
-                    ,(SELECT COUNT(goods_num) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
+                    ,(SELECT SUM(ok_amount) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_order_price
+                    ,(SELECT SUM(goods_num) FROM ea_mall_order WHERE ea_mall_order.salesman_id = ea_company_identity.id AND ea_mall_order.pay_status=1) AS count_goods_num
                 ')
                 ->page($page, $limit)
                 ->order($this->sort)
@@ -61,7 +61,7 @@ class salesman extends AdminController
                 // print_r($list); exit;
                 $identityDealer = $this->model->where('type',2)->where('status',1)->find();
                 foreach ($list as $key => &$value) {
-                    $value['idntity_dealer'] = $identityDealer->name;
+                    $value['idntity_dealer'] = $identityDealer->name; //经销商名
                 }
             }
             $data = [
@@ -83,10 +83,10 @@ class salesman extends AdminController
     {
         if ($this->request->isPost()) {
             $post = $this->request->post();
-            $post = trimArray($post);
+            
             $rule = [];
             $this->validate($post, $rule);
-
+            $post = trimArray($post);
             if ($this->model->where('name',$post['name'])->count() >=1) {
                 $this->error('已存在该名称,请重新输入!');
             }
