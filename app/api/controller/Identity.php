@@ -285,7 +285,7 @@ class Identity extends ApiController
             ->where($where)
             ->page($post['page'], $post['limit'])
             ->order('id desc')
-            ->field('id,name,phone,shop_address,head_image,shop_name,user_id')
+            ->field('id,name,phone,province,city,area,shop_address,head_image,shop_name,user_id')
             ->select();
         $count = $this->identityModel->where($where)->count();
         $data = [

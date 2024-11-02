@@ -62,23 +62,31 @@ class Order extends ApiController
 //        }else{
 //            $field = ['user_id','=',$identity['user_id']];
 //        }
-        if($identity['type'] == 3 && isset($post['type'])){
-            if($post['type']== 1){
-                $where[] = ['salesman_id','=',$identity['id']];
-                $where[] = ['shop_id','=',0];
-            }elseif($post['type'] == 2){
-                $where[] = ['salesman_id','=',$identity['id']];
-                $where[] = ['shop_id','<>',0];
-            }elseif($post['type'] == 3){
-                $where[] = ['shop_id','=',$post['id']];
+        if(isset($post['status']) && $post['status'] == 1){
+            $where[] = ['user_id','=',$identity['user_id']];
+        }else{
+            if($identity['type'] == 3 && isset($post['type'])){
+                if($post['type']== 1){
+                    $where[] = ['salesman_id','=',$identity['id']];
+                    $where[] = ['shop_id','=',0];
+                }elseif($post['type'] == 2){
+                    $where[] = ['salesman_id','=',$identity['id']];
+                    $where[] = ['shop_id','<>',0];
+                }elseif($post['type'] == 3){
+                    $where[] = ['shop_id','=',$post['id']];
+                }else{
+                    $where[] = ['user_id','=',$identity['user_id']];
+                }
+//            1:我的订单 2全部订单 3店铺订单
+            }elseif($identity['type'] == 4){
+                $where[] = ['shop_id','=',$identity['id']];
             }else{
                 $where[] = ['user_id','=',$identity['user_id']];
             }
-//            1:我的订单 2全部订单 3店铺订单
-        }elseif($identity['type'] == 4){
-            $where[] = ['shop_id','=',$identity['id']];
-        }else{
-            $where[] = ['user_id','=',$identity['user_id']];
+        }
+
+        if(isset($post['search'])){
+            $where[] = ['order_name|order_sn|order_phone|order_address','like','%'.$post['search'].'%'];
         }
         $list = $this->orderModel::with('orderList')
             ->where($where)

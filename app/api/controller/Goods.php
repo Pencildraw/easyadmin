@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\common\controller\ApiController;
 use think\App;
 use app\api\model\Identity;
+use app\api\model\Order;
 use think\facade\Env;
 // use app\admin\service\ConfigService;
 use app\BaseController;
@@ -42,6 +43,10 @@ class Goods extends ApiController
         ];
         $identity = $identityModel->where($where)->field('name,head_image')->find();
         $goodsData['identity'] = $identity;
+        if($this->identity['type'] == 5){
+            $orderModel = new Order();
+            $goodsData['is_order'] = $orderModel->where([['user_id','=',$this->identity['user_id']],['pay_status','=',1]])->count();
+        }
         return msg(200,'获取成功',$goodsData);
     }    
 }
