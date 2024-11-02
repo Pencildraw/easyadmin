@@ -86,9 +86,10 @@ class Identity extends ApiController
                 }    
                 $orderSum = $orderModel
                     ->where('pay_status',1)
-                    ->where($whereIs)
-                    ->whereOr($whereIsOr)
-                    // ->where('user_id',$this->identity['user_id'])
+                    ->where(function($query) use ($whereIs, $whereIsOr) { 
+                        $query->where($whereIs)
+                              ->WhereOr($whereIsOr);
+                    })
                     ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount ,sum(goods_num) as sum_order_goods')
                     // ->fetchsql(true)->select();    
                     ->select()->toArray();
@@ -98,6 +99,7 @@ class Identity extends ApiController
                 $order['sum_order_goods'] = $orderSum[0]['sum_order_goods'] ??0;
             // }
             $identityData['order'] = $order;
+            $identityData['identity_dealer_name'] = $this->identityModel->where('id',$identityData['dealer_id'])->value('name');
             
             return msg(200,'获取成功',$identityData);
         }
@@ -213,7 +215,7 @@ class Identity extends ApiController
         }
         $type = 4; //店铺类别
         $post['password'] = empty($post['password']) ?'123456':$post['password'];
-        if ($this->identityModel->where('name',$post['name'])->count() >1) {
+        if ($this->identityModel->where('name',$post['name'])->count() >=1) {
             return msg(100,'已存在该名称,请重新输入',$post);
         }
         // 店铺信息
