@@ -249,6 +249,7 @@ class Identity extends ApiController
         $list= $this->identityModel
             ->where($where)
             ->page($post['page'], $post['limit'])
+            ->order('id desc')
             ->field('id,name,phone,shop_address,head_image,shop_name,user_id')
             ->select();
         $count = $this->identityModel->where($where)->count();

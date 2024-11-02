@@ -88,6 +88,7 @@ class Order extends ApiController
             ')
             // ,(SELECT name FROM ea_company_identity WHERE ea_mall_order.dealer_id=ea_company_identity.id AND ea_mall_order.pay_status=1) AS identity_dealer_name
             ->page($post['page'],$post['limit'])
+            ->order('id desc')
             ->select();
             $identityModel = new \app\api\model\Identity();
             $identityDealer = $identityModel->find(1);
