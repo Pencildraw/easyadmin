@@ -80,6 +80,9 @@ class salesman extends AdminController
             $rule = [];
             $this->validate($post, $rule);
 
+            if ($this->model->where('name',$post['name'])->count() >1) {
+                $this->error('已存在该名称,请重新输入!');
+            }
             $post['password'] = empty($post['password']) ?'123456':$post['password'];
             $post['password'] = md5(md5($post['password']));
             // $post['binding_status'] = empty($post['user_id']) ?0:1;

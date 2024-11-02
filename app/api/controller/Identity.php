@@ -45,28 +45,58 @@ class Identity extends ApiController
             $identityData['type_title'] = $typeList[$identityData['type']] ??'';
             // 用户订单汇总
             $orderModel = new \app\api\model\Order();
-            if ($orderModel->where('user_id',$this->identity['user_id'])->count() <1) {
+            // if ($orderModel->where('user_id',$this->identity['user_id'])->count() <1) {
                 $order['sum_order'] = 0; //订单总数
                 $order['sum_amount'] = 0; //订单总销售额
+                $order['sum_order_goods'] = 0; //业务员旗下门总销售商品数
+                $order['sum_shop'] = 0; //业务员旗下门店数
                 $order['monther_order'] = 0; //月订单总数
                 $order['monther_amount'] = 0; //月订单总销售额
-            } else {
-                $orderSum = $orderModel->where('user_id',$this->identity['user_id'])
-                    ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount')
+                $whereIs = [];
+                $whereIsOr = [];
+            // } else {
+                if ($this->identity['type'] == 3) {
+                    // 业务员
+                    $shop_ids = $this->identityModel->where('salesman_id',$this->identity['id'])->column('id');
+                    $order['sum_shop'] = count($shop_ids);
+                    if (!empty($shop_ids)) {
+                        $whereIsOr[] = ['shop_id','in',implode(',' ,$shop_ids)];
+                    }
+                    $whereIs[] = ['salesman_id','=',$this->identity['id']];
+                    // print_r($whereIs); exit;
+
+                } else if ($this->identity['type'] == 4) {
+                    // 店铺
+                    $whereIs[] = ['shop_id','=',$this->identity['id']];
+                    // 当前月订单 销售额
+                    $currentDate = strtotime(date('Y').'-'.date('m').'-'.'01'); //当前月份时间戳
+                    $orderMonther = $orderModel
+                        ->where($whereIs)
+                        // ->where('user_id',$this->identity['user_id'])
+                        ->where([['create_time','>=',$currentDate]])
+                        ->where('pay_status',1)
+                        ->field('count(id) as monther_order ,sum(ok_amount) as monther_amount')
+                        ->select()->toArray();
+                    
+                    $order['monther_order'] = $orderMonther[0]['monther_order'] ??0;
+                    $order['monther_amount'] = $orderMonther[0]['monther_amount'] ??0.00;
+                } else {
+                    // 用户
+                    $whereIs[] = ['user_id','=',$this->identity['user_id']];
+                }    
+                $orderSum = $orderModel
                     ->where('pay_status',1)
+                    ->where($whereIs)
+                    ->whereOr($whereIsOr)
+                    // ->where('user_id',$this->identity['user_id'])
+                    ->field('count(id) as sum_order ,sum(ok_amount) as sum_amount ,sum(goods_num) as sum_order_goods')
+                    // ->fetchsql(true)->select();    
                     ->select()->toArray();
-                // 当前月订单 销售额
-                $currentDate = strtotime(date('Y').'-'.date('m').'-'.'01'); //当前月份时间戳
-                $orderMonther = $orderModel->where('user_id',$this->identity['user_id'])
-                    ->where([['create_time','>=',$currentDate]])
-                    ->where('pay_status',1)
-                    ->field('count(id) as monther_order ,sum(ok_amount) as monther_amount')
-                    ->select()->toArray();
+                    // print_r($orderSum); exit;
                 $order['sum_order'] = $orderSum[0]['sum_order']??0;
                 $order['sum_amount'] = $orderSum[0]['sum_amount'] ??0.00;
-                $order['monther_order'] = $orderMonther[0]['monther_order'] ??0;
-                $order['monther_amount'] = $orderMonther[0]['monther_amount'] ??0.00;
-            }
+                $order['sum_order_goods'] = $orderSum[0]['sum_order_goods'] ??0;
+            // }
             $identityData['order'] = $order;
             
             return msg(200,'获取成功',$identityData);
@@ -183,6 +213,9 @@ class Identity extends ApiController
         }
         $type = 4; //店铺类别
         $post['password'] = empty($post['password']) ?'123456':$post['password'];
+        if ($this->identityModel->where('name',$post['name'])->count() >1) {
+            return msg(100,'已存在该名称,请重新输入',$post);
+        }
         // 店铺信息
         $identityData = [
             'name' => $post['name'],
